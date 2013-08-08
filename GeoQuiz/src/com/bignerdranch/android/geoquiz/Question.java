@@ -1,6 +1,5 @@
 package com.bignerdranch.android.geoquiz;
 
-
 public class Question {
 
 	private int mStringResID;
@@ -19,15 +18,10 @@ public class Question {
 		mStringResID = stringResID;
 	}
 
-
 	public boolean getAnswer() {
 		return mAnswer;
 	}
-
 	public void setAnswer(boolean answer) {
 		mAnswer = answer;
 	}
-	
-	
-	
 }

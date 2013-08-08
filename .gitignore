@@ -1,2 +1,4 @@
 GeoQuiz/bin/*
 GeoQuiz/gen/*
+.gitignore~
+BNR Downloads/*

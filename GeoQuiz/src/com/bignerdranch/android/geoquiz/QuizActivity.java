@@ -41,9 +41,6 @@ public class QuizActivity extends Activity {
         mTrueButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-//				Toast.makeText(QuizActivity.this, // instantiate a Toast and call its show method all in one line
-//						R.string.incorrect_toast,
-//						Toast.LENGTH_SHORT).show();
 				checkAnswer(true);
 			}
 		});
@@ -53,9 +50,6 @@ public class QuizActivity extends Activity {
         mFalseButton.setOnClickListener(new View.OnClickListener() {
         	@Override
 			public void onClick(View v) {
-//				Toast.makeText(QuizActivity.this, // instantiate a Toast and call its show method all in one line
-//						R.string.correct_toast, 
-//						Toast.LENGTH_SHORT).show(); 
         		checkAnswer(false);
         	}
 		});
@@ -73,7 +67,6 @@ public class QuizActivity extends Activity {
 		});
 	}
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -89,13 +82,11 @@ public class QuizActivity extends Activity {
     private void checkAnswer(boolean userPressedTrue){
     	
     	int messageResID = 0;
-    	
     	boolean correctAnswer = mQuestionBank[mCurrentQuestionIndex].getAnswer();
     	
     	// get Toast
     	if (userPressedTrue == correctAnswer){ 	// user got the question right
     		messageResID = R.string.correct_toast;
-    	
     	}	
     	else {									// user got the question wrong
     		messageResID = R.string.incorrect_toast;
@@ -111,5 +102,4 @@ public class QuizActivity extends Activity {
         	updateQuetionText();
     	}
     }
-    
 }
