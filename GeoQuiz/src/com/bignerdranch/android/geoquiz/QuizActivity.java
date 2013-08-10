@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,8 +14,9 @@ public class QuizActivity extends Activity {
 	// =============== member variables ===================
 	private Button mTrueButton;
 	private Button mFalseButton;
-	private Button mNextButton;
-	private Button mPreviousButton;
+	private ImageButton mNextButton;
+	private ImageButton mPreviousButton;
+	
 	private TextView mQuestionTextView;
 	private int mCurrentQuestionIndex = 0; // this is the index in the questionBank array; it is NOT the question string's resource ID
 	
@@ -64,8 +66,8 @@ public class QuizActivity extends Activity {
         	}
 		});
     
-        // create previous button and create its listener
-        mPreviousButton = (Button)findViewById(R.id.previous_button);
+        // create previous image button and create its listener
+        mPreviousButton = (ImageButton)findViewById(R.id.previous_button);
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -80,8 +82,8 @@ public class QuizActivity extends Activity {
 			}
 		});
         
-        // create next button and create its listener
-        mNextButton = (Button)findViewById(R.id.next_button);
+        // create next image button and create its listener
+        mNextButton = (ImageButton)findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -106,7 +108,6 @@ public class QuizActivity extends Activity {
     }
     
     private void checkAnswer(boolean userPressedTrue){
-    	
     	int messageResID = 0;
     	boolean correctAnswer = mQuestionBank[mCurrentQuestionIndex].getAnswer();
     	
