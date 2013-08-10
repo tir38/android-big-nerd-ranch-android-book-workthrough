@@ -8,6 +8,7 @@
 	<string name="true_button">True</string>
 	<string name="false_button">False</string>
 	<string name="next_button">Next</string>
+	<string name="previous_button">Previous</string>
 	
 	<!-- question string(s) -->
 	<string name="question_oceans">The Pacific Ocean is larger than the Atlantic Ocean.</string>

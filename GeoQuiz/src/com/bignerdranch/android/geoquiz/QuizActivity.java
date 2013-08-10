@@ -1,7 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
 import android.app.Activity;
-import android.media.MediaRouter.UserRouteInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -15,6 +14,7 @@ public class QuizActivity extends Activity {
 	private Button mTrueButton;
 	private Button mFalseButton;
 	private Button mNextButton;
+	private Button mPreviousButton;
 	private TextView mQuestionTextView;
 	private int mCurrentQuestionIndex = 0; // this is the index in the questionBank array; it is NOT the question string's resource ID
 	
@@ -38,7 +38,7 @@ public class QuizActivity extends Activity {
 			
 			@Override
 			public void onClick(View arg0) {
-				mCurrentQuestionIndex++;// increment question index ...
+		        mCurrentQuestionIndex = (mCurrentQuestionIndex+1) % mQuestionBank.length; // increment question index, reset to zero if at end
 				updateQuetionText();	// ... and update question
 				
 			}
@@ -64,6 +64,22 @@ public class QuizActivity extends Activity {
         	}
 		});
     
+        // create previous button and create its listener
+        mPreviousButton = (Button)findViewById(R.id.previous_button);
+        mPreviousButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				if (mCurrentQuestionIndex == 0){
+					mCurrentQuestionIndex = mQuestionBank.length-1; // assign index of last question, in case I get a negative number by going from 0 -> -1
+				}
+				else{
+					mCurrentQuestionIndex = (mCurrentQuestionIndex-1) % mQuestionBank.length; // all other indices
+				}
+				updateQuetionText();
+			}
+		});
+        
         // create next button and create its listener
         mNextButton = (Button)findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
