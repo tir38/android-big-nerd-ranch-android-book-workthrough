@@ -34,7 +34,17 @@ public class QuizActivity extends Activity {
        
         // on startup, get the first question
         mQuestionTextView = (TextView)findViewById(R.id.question_text_view);  	// get view to populate
-        updateQuetionText();														// update question
+        mQuestionTextView.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				mCurrentQuestionIndex++;// increment question index ...
+				updateQuetionText();	// ... and update question
+				
+			}
+		});
+		
+        updateQuetionText(); 	// update question (first time through)
         
         // create true button and create its listener
         mTrueButton = (Button)findViewById(R.id.true_button);
