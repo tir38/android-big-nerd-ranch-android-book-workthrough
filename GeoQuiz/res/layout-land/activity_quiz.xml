@@ -1,21 +1,31 @@
-<LinearLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- <LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android1="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical" > -->
 
+<FrameLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/FrameLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    
     <TextView 
         android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="24dp"
+        android:layout_gravity="center_horizontal"
     />
     
     <LinearLayout 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical|center_horizontal">
         
         <Button 
             android:id="@+id/true_button"
@@ -31,15 +41,18 @@
         
     </LinearLayout>
     
-    <LinearLayout 
+<!--     <LinearLayout 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
+        android:orientation="horizontal"
+        android:layout_gravity="bottom">
+ -->
+        
 	    <ImageButton
 	        android:id="@+id/previous_button"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:layout_gravity="left|bottom"
 	        android:contentDescription="@string/previous_button"
 	        android:src="@drawable/arrow_left"
 	    	/><!--  keep contentDescription as @string for vision-impared users -->
@@ -48,9 +61,12 @@
 	        android:id="@+id/next_button"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:layout_gravity="right|bottom"
 	    	android:src="@drawable/arrow_right"
 	    	android:contentDescription="@string/next_button"
 	    	/><!--  keep contentDescription as @string for vision-impared users -->
 		
-	</LinearLayout>    
-</LinearLayout>
+	<!--  </LinearLayout> -->
+	    
+<!-- </LinearLayout> -->
+</FrameLayout>

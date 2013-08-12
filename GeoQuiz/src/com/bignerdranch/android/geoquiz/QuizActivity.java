@@ -2,6 +2,7 @@ package com.bignerdranch.android.geoquiz;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -27,13 +28,23 @@ public class QuizActivity extends Activity {
 			new Question(R.string.question_mideast, false),
 			new Question(R.string.question_oceans, true),
 	};
+	
+	private static final String TAG = "QuizActivity"; // activity tag for Log
+	private static final String KEY_INDEX = "index"; // key for the key/value pair to store mCurrentQuestionIndex in Bundle
 
 	// =============== class methods ==================
 	@Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-       
+
+        Log.d(TAG, "onCreate(Bundle) called");
+        
+        // check for saved state
+        if (savedInstanceState != null){
+        	mCurrentQuestionIndex = savedInstanceState.getInt(KEY_INDEX, 0); // 0 = default value
+        }
+        
         // on startup, get the first question
         mQuestionTextView = (TextView)findViewById(R.id.question_text_view);  	// get view to populate
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +106,43 @@ public class QuizActivity extends Activity {
 		});
 	}
 
+	
+	@Override
+	public void onStart(){
+		super.onStart();
+		Log.d(TAG, "onStart() called");
+	}
+	
+	@Override
+	public void onPause(){
+		super.onPause();
+		Log.d(TAG, "onPause() called");
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		Log.d(TAG, "onResume() called");
+	}
+	
+	@Override
+	public void onStop(){
+		super.onStop();
+		Log.d(TAG, "onStop() called");
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		Log.d(TAG, "onDestroy() called");
+	}
+	
+	public void onSaveInstanceState(Bundle savedInstanceState){
+		super.onSaveInstanceState(savedInstanceState);
+		Log.i(TAG, "saving state");
+		savedInstanceState.putInt(KEY_INDEX, mCurrentQuestionIndex);
+		}
+	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
