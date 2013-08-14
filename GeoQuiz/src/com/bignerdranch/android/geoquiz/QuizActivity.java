@@ -1,6 +1,7 @@
 package com.bignerdranch.android.geoquiz;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -15,11 +16,13 @@ public class QuizActivity extends Activity {
 	// =============== member variables ===================
 	private Button mTrueButton;
 	private Button mFalseButton;
+	private Button mCheatButton;
 	private ImageButton mNextButton;
 	private ImageButton mPreviousButton;
 	
 	private TextView mQuestionTextView;
 	private int mCurrentQuestionIndex = 0; // this is the index in the questionBank array; it is NOT the question string's resource ID
+	private boolean mIsCheater;
 	
 	private Question[] mQuestionBank = new Question[]{
 			new Question(R.string.question_africa, false),
@@ -35,8 +38,8 @@ public class QuizActivity extends Activity {
 	// =============== class methods ==================
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_quiz);
+        super.onCreate(savedInstanceState); 		// call superclass method
+        setContentView(R.layout.activity_quiz); 	// get view for this controller
 
         Log.d(TAG, "onCreate(Bundle) called");
         
@@ -76,6 +79,20 @@ public class QuizActivity extends Activity {
         		checkAnswer(false);
         	}
 		});
+        
+        // create cheat button and its listener
+        mCheatButton= (Button)findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent toCheatActivityIntent = new Intent(QuizActivity.this, CheatActivity.class); // create intent to pass to CheatActivity
+				boolean tempAnswer = mQuestionBank[mCurrentQuestionIndex].getAnswer(); 	// get current question's answer
+				toCheatActivityIntent.putExtra(CheatActivity.EXTRA_ANSWER, tempAnswer);	// add answer to extra
+//				startActivity(toCheatActivityIntent); 									// launch Cheat Activity with intent
+				startActivityForResult(toCheatActivityIntent, 0); 						// launch Cheat Activity with intent, expect return data
+					}
+		});
     
         // create previous image button and create its listener
         mPreviousButton = (ImageButton)findViewById(R.id.previous_button);
@@ -89,6 +106,7 @@ public class QuizActivity extends Activity {
 				else{
 					mCurrentQuestionIndex = (mCurrentQuestionIndex-1) % mQuestionBank.length; // all other indices
 				}
+				mIsCheater = false; // reset cheater status for previous question
 				updateQuetionText();
 			}
 		});
@@ -101,6 +119,7 @@ public class QuizActivity extends Activity {
 			public void onClick(View v) {
 				// get the next questionTextView by using next questions's resource ID
 		        mCurrentQuestionIndex = (mCurrentQuestionIndex+1) % mQuestionBank.length;			// increment question index, reset to zero if at end
+				mIsCheater = false; // reset cheater status for next question
 		        updateQuetionText();
 			}
 		});
@@ -160,11 +179,16 @@ public class QuizActivity extends Activity {
     	boolean correctAnswer = mQuestionBank[mCurrentQuestionIndex].getAnswer();
     	
     	// get Toast
-    	if (userPressedTrue == correctAnswer){ 	// user got the question right
-    		messageResID = R.string.correct_toast;
-    	}	
-    	else {									// user got the question wrong
-    		messageResID = R.string.incorrect_toast;
+    	if (mIsCheater){	// first check for cheater
+    		messageResID = R.string.judgement_toast;
+    	}
+    	else{ /// then if not cheater...
+	    	if (userPressedTrue == correctAnswer){ 	// user got the question right
+	    		messageResID = R.string.correct_toast;
+	    	}	
+	    	else {									// user got the question wrong
+	    		messageResID = R.string.incorrect_toast;
+	    	}
     	}
     	
     	// display Toast
@@ -176,5 +200,14 @@ public class QuizActivity extends Activity {
 	        mCurrentQuestionIndex = (mCurrentQuestionIndex+1) % mQuestionBank.length;			// increment question index, reset to zero if at end
         	updateQuetionText();
     	}
+    }
+
+    @Override // get returned results from CheatActivity
+    protected void onActivityResult(int requestCode, int resultCode, Intent returnedIntent){
+    	if(returnedIntent == null){ // if intent not returned
+    		return;
+    	}
+    	
+    	mIsCheater = returnedIntent.getBooleanExtra(CheatActivity.EXTRA_IS_CHEATER, false);
     }
 }
