@@ -1,7 +1,10 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -42,12 +45,19 @@ public class QuizActivity extends Activity {
 	private static final String KEY_IS_CHEATER = "isCheater"; // key for the k/v pair to store cheater status ON CURRENT QUESTION ONLY
 	
 	// =============== class methods ==================
+	@TargetApi(11)
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); 		// call superclass method
         setContentView(R.layout.activity_quiz); 	// get view for this controller
 
         Log.d(TAG, "onCreate(Bundle) called");
+        
+        // create subtitle in action bar
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){ // if version is >= honeycomb
+	        ActionBar actionBar = getActionBar();
+	        actionBar.setSubtitle("Bodies of Water");
+        }
         
         // check for saved state
         if (savedInstanceState != null){
