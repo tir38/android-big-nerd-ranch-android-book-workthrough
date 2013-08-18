@@ -3,6 +3,7 @@ package com.bignerdranch.android.geoquiz;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,7 +14,12 @@ public class CheatActivity extends Activity {
 	public static final String EXTRA_ANSWER = "com.bignerdranch.android.geoquiz.answer"; // i want the full path of my intent extra so that I can call this Activity from anywhere
 	public static final String EXTRA_IS_CHEATER = "com.bignerdranch.android.geoquiz.isCheater";
 	
+	// bundle keys
+	public static final String KEY_IS_CHEATER = "isCheater";
+	
+	// buttons and misc.
 	public boolean mAnswer;
+	public boolean mIsCheater;
 	public Button mShowAnswerButton;
 	public TextView mAnswerTextView;
 	
@@ -28,9 +34,17 @@ public class CheatActivity extends Activity {
 		
 		// set text view
 		mAnswerTextView = (TextView)findViewById(R.id.answerTextView);
-		
+
+		// check for saved state, specifically, look for isCheater set
+        if (savedInstanceState != null){ 
+        	mIsCheater = savedInstanceState.getBoolean(KEY_IS_CHEATER, false); // false = default value
+        }
+        else {  // else no saved state
+        	mIsCheater = false;
+        }
+        
 		// set default return intent
-		setIsCheater(false);
+		setOutputIntent();
 		
 		// create show answer button and its listener
 		mShowAnswerButton = (Button)findViewById(R.id.showAnswerButton);
@@ -45,17 +59,26 @@ public class CheatActivity extends Activity {
 				else{
 					mAnswerTextView.setText(R.string.false_button);
 				}
-				setIsCheater(true);
+				mIsCheater = true;
+				setOutputIntent();
 			}
 		});
 		
 	}
 
 	
-	
-	private void setIsCheater(boolean isCheater){
-		Intent outputIntent = new Intent(); 				// don't define package or class
-		outputIntent.putExtra(EXTRA_IS_CHEATER, isCheater);	// add key/value pair extra to intent
-		setResult(RESULT_OK, outputIntent);					// set intent
+//	private void setIsCheater(boolean isCheater){
+	private void setOutputIntent(){
+		// this now pulls isCheater from member variable mIsCheater
+		Intent outputIntent = new Intent(); 					// don't define package or class
+		outputIntent.putExtra(EXTRA_IS_CHEATER, mIsCheater);	// add key/value pair extra to intent
+		setResult(RESULT_OK, outputIntent);						// set intent
 	}
+
+	public void onSaveInstanceState(Bundle savedInstanceState){
+		super.onSaveInstanceState(savedInstanceState);
+//		Log.i(TAG, "saving state");
+		savedInstanceState.putBoolean(KEY_IS_CHEATER, mIsCheater);
+		}
+
 }
