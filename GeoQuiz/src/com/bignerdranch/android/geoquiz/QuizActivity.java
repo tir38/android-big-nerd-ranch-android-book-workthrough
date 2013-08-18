@@ -26,6 +26,7 @@ public class QuizActivity extends Activity {
 	
 	// other view related 
 	private TextView mQuestionTextView;
+	private TextView mAPILevelTextView;
 	
 	// working variables
 	private int mCurrentQuestionIndex = 0; // this is the index in the questionBank array; it is NOT the question string's resource ID
@@ -148,6 +149,12 @@ public class QuizActivity extends Activity {
 		        updateQuetionText();
 			}
 		});
+	
+        // set API_level_text_view
+        int apiLevel = Build.VERSION.SDK_INT; // get api level as integer 
+        mAPILevelTextView = (TextView)findViewById(R.id.API_level_text_view); // get view
+        mAPILevelTextView.setText("API level" + apiLevel);									// set textView's text
+	
 	}
 
 	

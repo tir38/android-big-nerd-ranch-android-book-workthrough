@@ -59,4 +59,13 @@
 	    	/><!--  keep contentDescription as @string for vision-impared users -->
 		
 	</LinearLayout>    
+	
+    <TextView 
+        android:id="@+id/API_level_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:gravity="bottom"/>
+    	<!-- can I force this to be at the bottom of the screen? -->
+    
 </LinearLayout>
