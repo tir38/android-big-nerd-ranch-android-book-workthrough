@@ -14,27 +14,33 @@ import android.widget.Toast;
 public class QuizActivity extends Activity {
 
 	// =============== member variables ===================
+	// buttons
 	private Button mTrueButton;
 	private Button mFalseButton;
 	private Button mCheatButton;
 	private ImageButton mNextButton;
 	private ImageButton mPreviousButton;
 	
+	// other view related 
 	private TextView mQuestionTextView;
-	private int mCurrentQuestionIndex = 0; // this is the index in the questionBank array; it is NOT the question string's resource ID
-	private boolean mIsCheater;
 	
+	// working variables
+	private int mCurrentQuestionIndex = 0; // this is the index in the questionBank array; it is NOT the question string's resource ID
 	private Question[] mQuestionBank = new Question[]{
-			new Question(R.string.question_africa, false),
+			new Question(R.string.question_africa, false), // set all default cheater status to false
 			new Question(R.string.question_americans, true),
 			new Question(R.string.question_asia, true),
 			new Question(R.string.question_mideast, false),
 			new Question(R.string.question_oceans, true),
 	};
+	private boolean mIsCheater; // FOR CURRENT QUESTION ONLY
 	
+	// string constants
 	private static final String TAG = "QuizActivity"; // activity tag for Log
-	private static final String KEY_INDEX = "index"; // key for the key/value pair to store mCurrentQuestionIndex in Bundle
-
+	private static final String KEY_INDEX = "index"; // key for the key/value pair to store mCurrentQuestionIndex in Bundle;
+//	private static final String KEY_QUESTION_BANK = "questionBank"; // key for the k/v pair to store question bank; // NOT WORKING YET
+	private static final String KEY_IS_CHEATER = "isCheater"; // key for the k/v pair to store cheater status ON CURRENT QUESTION ONLY
+	
 	// =============== class methods ==================
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,9 +52,15 @@ public class QuizActivity extends Activity {
         // check for saved state
         if (savedInstanceState != null){
         	mCurrentQuestionIndex = savedInstanceState.getInt(KEY_INDEX, 0); // 0 = default value
+        	mIsCheater = savedInstanceState.getBoolean(KEY_IS_CHEATER, false); // false = default value
+        	
+        	// NOT WORKING YET:
+        	// check to see if QuestionBank is saved in state
+        	// if so, set mQuestionBank to that
+        	// if not, set default question bank
         }
         
-        // on startup, get the first question
+        // set question text view and its listener
         mQuestionTextView = (TextView)findViewById(R.id.question_text_view);  	// get view to populate
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
 			
@@ -60,7 +72,7 @@ public class QuizActivity extends Activity {
 			}
 		});
 		
-        updateQuetionText(); 	// update question (first time through)
+        updateQuetionText(); 	// update question (first time through, only)
         
         // create true button and create its listener
         mTrueButton = (Button)findViewById(R.id.true_button);
@@ -89,9 +101,13 @@ public class QuizActivity extends Activity {
 				Intent toCheatActivityIntent = new Intent(QuizActivity.this, CheatActivity.class); // create intent to pass to CheatActivity
 				boolean tempAnswer = mQuestionBank[mCurrentQuestionIndex].getAnswer(); 	// get current question's answer
 				toCheatActivityIntent.putExtra(CheatActivity.EXTRA_ANSWER, tempAnswer);	// add answer to extra
-//				startActivity(toCheatActivityIntent); 									// launch Cheat Activity with intent
+
+				Log.d(TAG, "about to enter CheatActivity");
 				startActivityForResult(toCheatActivityIntent, 0); 						// launch Cheat Activity with intent, expect return data
-					}
+				Log.d(TAG, "just returned from CheatActivity");
+				// it is important to note that returning from this activity DOES NOT return to this point.
+				// instead OS calls QuizActivity.onActivityResult(), QuizActivity.onStart(), and QuizActivity.onResume()
+			}
 		});
     
         // create previous image button and create its listener
@@ -119,7 +135,6 @@ public class QuizActivity extends Activity {
 			public void onClick(View v) {
 				// get the next questionTextView by using next questions's resource ID
 		        mCurrentQuestionIndex = (mCurrentQuestionIndex+1) % mQuestionBank.length;			// increment question index, reset to zero if at end
-				mIsCheater = false; // reset cheater status for next question
 		        updateQuetionText();
 			}
 		});
@@ -170,8 +185,10 @@ public class QuizActivity extends Activity {
     }
 
     private void updateQuetionText(){
-    	  int currentStringResID = mQuestionBank[mCurrentQuestionIndex].getStringResID(); 	// get the resource ID of the string of the current question
-    	  mQuestionTextView.setText(currentStringResID); 										// set the text of the view
+    	int currentStringResID = mQuestionBank[mCurrentQuestionIndex].getStringResID(); 	// get the resource ID of the string of the current question
+    	mQuestionTextView.setText(currentStringResID); 										// set the text of the view
+    	mIsCheater = false; // reset cheater status for next question
+		// NOT WORKING YET, get cheater status from questionBank	
     }
     
     private void checkAnswer(boolean userPressedTrue){
@@ -179,7 +196,12 @@ public class QuizActivity extends Activity {
     	boolean correctAnswer = mQuestionBank[mCurrentQuestionIndex].getAnswer();
     	
     	// get Toast
-    	if (mIsCheater){	// first check for cheater
+    	if (mIsCheater){	// first check for cheaters 
+    		messageResID = R.string.judgement_toast;
+    	}
+    	else if (mQuestionBank[mCurrentQuestionIndex].getWasCheater()){ // check cheater status	
+    		// NOT WORKING YET, eventually I won't need to check member variable mIsCheater; I'll only need to check questionBank
+    		// however, question bank isn't currently part of saved state
     		messageResID = R.string.judgement_toast;
     	}
     	else{ /// then if not cheater...
@@ -204,10 +226,13 @@ public class QuizActivity extends Activity {
 
     @Override // get returned results from CheatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent returnedIntent){
+    	Log.d(TAG, "onActivityResult() called");
     	if(returnedIntent == null){ // if intent not returned
     		return;
     	}
     	
-    	mIsCheater = returnedIntent.getBooleanExtra(CheatActivity.EXTRA_IS_CHEATER, false);
+    	mIsCheater = returnedIntent.getBooleanExtra(CheatActivity.EXTRA_IS_CHEATER, false); // update cheater status FOR CURRENT QUESTION
+    	mQuestionBank[mCurrentQuestionIndex].setWasCheater(mIsCheater); // update cheater status in Question Bank
+    	Log.d(TAG, "setting cheater status for question[" + mCurrentQuestionIndex + "] to " + mQuestionBank[mCurrentQuestionIndex].getWasCheater());
     }
 }
