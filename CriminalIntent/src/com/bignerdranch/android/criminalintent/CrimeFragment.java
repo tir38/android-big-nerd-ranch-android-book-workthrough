@@ -3,7 +3,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 //REMEMBER: this is a controller: controlling the view of a single crime!
+
 public class CrimeFragment extends Fragment {
 
 	private Crime mCrime;
@@ -33,8 +33,8 @@ public class CrimeFragment extends Fragment {
 							 Bundle savedInstanceState){
 		View v = inflater.inflate(R.layout.fragment_crime, parent, false); 	// inflate view
 		
-		
 		// handle mTitleField
+
 		mTitleField = (EditText)v.findViewById(R.id.crime_title);
 		mTitleField.addTextChangedListener(new TextWatcher() 
 			{ // begin anonymous inner class, with three class methods
@@ -76,5 +76,4 @@ public class CrimeFragment extends Fragment {
 		
 		return v;															// return view
 	}
-
 }
