@@ -1,8 +1,10 @@
 package com.bignerdranch.android.criminalintent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ public class CrimeFragment extends Fragment {
 		mCrime = new Crime();				// instantiate new Crime
 	}
 	
+	@SuppressWarnings("static-access")
 	@Override
 	public View onCreateView(LayoutInflater inflater, 
 							 ViewGroup parent, 
@@ -60,7 +63,8 @@ public class CrimeFragment extends Fragment {
 		
 		// handle mDateButton
 		mDateButton = (Button)v.findViewById(R.id.crime_date);
-		mDateButton.setText(mCrime.getDate().toString());
+//		mDateButton.setText(mCrime.getDate().toString()); // default display
+		mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", mCrime.getDate()).toString()); // format display
 		mDateButton.setEnabled(false);
 		
 		// handle mSolvedCheckBox;
