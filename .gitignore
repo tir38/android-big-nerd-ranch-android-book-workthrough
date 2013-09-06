@@ -2,3 +2,5 @@ GeoQuiz/bin/*
 GeoQuiz/gen/*
 .gitignore~
 BNR_downloads/*
+CriminalIntent/bin/*
+CriminalIntent/gen/*
