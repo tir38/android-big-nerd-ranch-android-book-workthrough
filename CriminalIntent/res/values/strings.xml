@@ -4,9 +4,11 @@
     <string name="app_name">CriminalIntent</string>
     <string name="crime_title_hint">Enter a title for the crime.</string>
 
-    <!-- cimre fragment strings; these might be used elsewhere later -->
+    <!-- crime fragment strings; these might be used elsewhere later -->
     <string name="crime_title_label">Title</string>
     <string name="crime_description_label">Description</string>
     <string name="crime_solved_label">Solved?</string>
 
+    <!-- crimes fragment strings -->
+    <string name="crimes_title">Crimes</string>
 </resources>
