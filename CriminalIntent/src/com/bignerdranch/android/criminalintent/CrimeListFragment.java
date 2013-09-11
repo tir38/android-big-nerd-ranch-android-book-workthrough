@@ -2,6 +2,7 @@ package com.bignerdranch.android.criminalintent;
 
 import java.util.ArrayList;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -15,8 +16,8 @@ import android.widget.TextView;
 public class CrimeListFragment extends ListFragment {
 
 	private ArrayList<Crime> mCrimes;
-	private static final String TAG = "CrimeListFragment";	
-	
+	private static final String TAG = "CriminalIntent";	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState); // call super-class method
@@ -33,8 +34,20 @@ public class CrimeListFragment extends ListFragment {
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id){
-		Crime c = ((CrimeAdapter)getListAdapter()).getItem(position); // get a crime using my custom adapter
-		Log.d(TAG, c.getTitle() + " was called.");
+		Crime crime = ((CrimeAdapter)getListAdapter()).getItem(position); // get a crime using my custom adapter
+		
+		// create intent and start a CrimeActivity
+		Intent intent = new Intent(getActivity(), CrimeActivity.class);
+		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());
+		startActivity(intent);
+	}
+
+	// override onResume to update list any time the fragment resumes...
+	// ... when returning from CrimeActivity
+	@Override
+	public void onResume(){
+		super.onResume(); // call super class method
+		((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
 	}
 	
 	// inner class to handle Crime adapter

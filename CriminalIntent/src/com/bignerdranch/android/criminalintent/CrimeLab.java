@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import android.content.Context;
+import android.util.Log;
 
 
 // REMEMBER: this is a singleton
@@ -13,7 +14,8 @@ public class CrimeLab {
 	private static CrimeLab sCrimeLab;
 	private Context mAppContext;
 	private ArrayList<Crime> mCrimes;
-	
+	private static final String TAG = "CriminalIntent";	
+
 	private CrimeLab(Context appContext){ // constructor
 		mAppContext = appContext;
 		mCrimes = new ArrayList<Crime>();
@@ -44,10 +46,13 @@ public class CrimeLab {
 	// return single crime, based on UUID
 	public Crime getCrime(UUID id){
 		for (int i = 0; i < mCrimes.size(); i++){
-			if (mCrimes.get(i).getID() == id){
+//			if (mCrimes.get(i).getID() == id){ // WHY WON"T THIS WORK???
+			if (mCrimes.get(i).getID().equals(id)){
 				return mCrimes.get(i);
 			}
 		}
+		// if you get here, crime was not found
+		Log.w(TAG, "crime not found!");
 		return null;
 	}
 	
