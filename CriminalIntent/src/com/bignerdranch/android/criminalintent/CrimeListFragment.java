@@ -36,8 +36,8 @@ public class CrimeListFragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id){
 		Crime crime = ((CrimeAdapter)getListAdapter()).getItem(position); // get a crime using my custom adapter
 		
-		// create intent and start a CrimeActivity
-		Intent intent = new Intent(getActivity(), CrimeActivity.class);
+		// create intent and start a CrimePagerActivity
+		Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
 		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());
 		startActivity(intent);
 	}
@@ -51,6 +51,9 @@ public class CrimeListFragment extends ListFragment {
 	}
 	
 	// inner class to handle Crime adapter
+	// WTF_isGoingOnHere: this adapter juggles an ArrayList to provide views for each item in the list.
+	// The fragment can't do this itself; The Adapter is especially good at the repetitive task
+	// of creating a view for each item in the list.
 	private class CrimeAdapter extends ArrayAdapter<Crime>{
 		
 		public CrimeAdapter(ArrayList<Crime> crimes){ // constructor
@@ -66,8 +69,7 @@ public class CrimeListFragment extends ListFragment {
 			}
 			
 			// configure view for specific crime
-			Crime crime = getItem(position);// get crime from arraylist
-//			Crime crime = mCrimes.get(position); // DON'T USE THIS. Instead rely on the adapter to handle interactions with the model. Thats what its there for!
+			Crime crime = getItem(position);// get crime from arraylist using adapter
 		
 			// handle titleTextView
 			TextView titleTextView = (TextView)convertView.findViewById(R.id.crime_list_item_titleTextView);

@@ -61,7 +61,7 @@ public class CrimeFragment extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_crime, parent, false); 	// inflate view
 		
 		// handle mTitleField
-		mTitleField = (EditText)v.findViewById(R.id.crime_title);
+		mTitleField = (EditText)v.findViewById(R.id.crime_title);		
 		mTitleField.setText(mCrime.getTitle()); // set text of crime' title
 		mTitleField.addTextChangedListener(new TextWatcher() 
 			{ // begin anonymous inner class, with three class methods
