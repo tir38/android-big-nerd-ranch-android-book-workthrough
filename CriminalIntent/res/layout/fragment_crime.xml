@@ -6,7 +6,7 @@
     
     <!-- title label -->
 	<TextView
-	    android:layout_height = "match_parent"
+	    android:layout_height = "wrap_content"
 		android:layout_width = "match_parent"
 		android:text = "@string/crime_title_label"
 		    	style="?android:listSeparatorTextViewStyle"
@@ -16,13 +16,13 @@
     <EditText 
         android:id="@+id/crime_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:hint="@string/crime_title_hint"
     />
     
     <!-- descrption label -->
     <TextView 
-    	android:layout_height="match_parent"
+    	android:layout_height="wrap_content"
     	android:layout_width="match_parent"
     	android:text="@string/crime_description_label"
     	style="?android:listSeparatorTextViewStyle"
@@ -32,7 +32,7 @@
     <Button 
     	android:id="@+id/crime_date"
     	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
+    	android:layout_height="wrap_content"
     	android:layout_marginLeft="16dp"
     	android:layout_marginRight="16dp"
     />
@@ -41,7 +41,7 @@
     <CheckBox 
     	android:id="@+id/crime_solved"
     	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
+    	android:layout_height="wrap_content"
     	android:layout_marginLeft="16dp"
     	android:layout_marginRight="16dp"
     	android:text="@string/crime_solved_label"
