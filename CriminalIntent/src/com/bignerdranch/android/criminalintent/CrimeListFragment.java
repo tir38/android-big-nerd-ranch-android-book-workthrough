@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -77,7 +77,7 @@ public class CrimeListFragment extends ListFragment {
 			
 			// handle dateTextView
 			TextView dateTextView = (TextView)convertView.findViewById(R.id.crime_list_item_dateTextView);
-			dateTextView.setText(crime.getDate().toString()); // consider using formatter from CH8 challenge !!!!!!!
+			dateTextView.setText(DateFormat.format("EEEE, MMM, dd, yyyy", crime.getDate()).toString()); 
 			
 			// handle solvedCheckBox
 			CheckBox solvedCheckBox = (CheckBox)convertView.findViewById(R.id.crime_list_item_solvedCheckBox);
