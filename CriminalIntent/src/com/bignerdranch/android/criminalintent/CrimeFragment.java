@@ -1,12 +1,15 @@
 package com.bignerdranch.android.criminalintent;
+import java.util.Date;
 import java.util.UUID;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +28,10 @@ public class CrimeFragment extends Fragment {
 	private Button mDateButton;
 	private CheckBox mSolvedCheckBox;
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
-	private static final String TAG = "CriminalIntent";	
+	public static final String DIALOG_DATE = "date";
+	public static final int REQUEST_DATE = 0; 			// for target fragment
+	private static final String TAG = "CriminalIntent";	// for debugging
 
-	
 	// instantiate a new CrimeFragment based on a crime's ID
 	public static CrimeFragment newInstance(UUID crimeID){
 		// create a bundle for this instance
@@ -87,8 +91,26 @@ public class CrimeFragment extends Fragment {
 		
 		// handle mDateButton
 		mDateButton = (Button)v.findViewById(R.id.crime_date);
-		mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", mCrime.getDate()).toString()); // format display
-		mDateButton.setEnabled(false);
+		updateDateText(mCrime.getDate());
+//		mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", mCrime.getDate()).toString()); // format display
+		mDateButton.setOnClickListener(new View.OnClickListener() 
+			{ // anonymous inner class
+				public void onClick(View v){
+					FragmentManager fragmentManager = getActivity()
+														.getSupportFragmentManager(); 	// get fragManager of hosting activity
+					DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate()); // create new DatePickerFragment using crime date
+					dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+					dialog.show(fragmentManager, DIALOG_DATE); 							// show this fragment, and set its tag to the string contained in DIALOG_DATE
+			
+					// It might seem odd that we are setting the DatePickerFragment's Tag here, and not in DatePickerFragment.java.
+					// But since we are instantiating DatePickerFragment here, we want to be able to set its tag here, too.
+					// How could an instance of DatePickerFragment set its own tag anyways?
+					
+					// It might also seem odd that we are instantiating a DatePickerFragment here and not in the hosting activity.
+					// But since we need a DatePickerFragment ONLY when we click on the date field, we create it here.
+				}
+			}
+		);
 		
 		// handle mSolvedCheckBox;
 		mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
@@ -104,4 +126,23 @@ public class CrimeFragment extends Fragment {
 		
 		return v;															// return view
 	}
+
+	// receive data from DatePickerFragment 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		if(resultCode != Activity.RESULT_OK) return;
+		if(requestCode == REQUEST_DATE) {
+			Date date = (Date)data
+								.getSerializableExtra(DatePickerFragment.EXTRA_DATE); // get date from intent
+			mCrime.setDate(date); // set crime's date
+//			mDateButton.setText(mCrime.getDate().toString()); // update date button's text TODO: replace with formatted date
+			updateDateText(mCrime.getDate());
+		}
+	}
+
+	public void updateDateText(Date date){
+		mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", date).toString()); // format display
+	}
+	
+
 }
