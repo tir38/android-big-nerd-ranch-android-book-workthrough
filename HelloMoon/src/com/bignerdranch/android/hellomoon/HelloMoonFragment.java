@@ -25,6 +25,10 @@ public class HelloMoonFragment extends Fragment {
 	private CustomPlayer mAudioPlayer = new CustomPlayer(R.raw.one_small_step);
 	public static final String TAG = "helloMoon";
 	
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState); // call super class method
+		setRetainInstance(true);
+	}
 	
 	public View onCreateView(LayoutInflater inflater,
 								ViewGroup parent,
