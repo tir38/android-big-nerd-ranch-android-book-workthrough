@@ -12,6 +12,7 @@ import android.widget.Button;
 public class HelloMoonFragment extends Fragment {
 
 	private Button mPlayButton;
+	private Button mPauseButton;
 	private Button mStopButton;
 	private AudioPlayer mPlayer = new AudioPlayer();
 	public static final String TAG = "helloMoon";
@@ -28,10 +29,19 @@ public class HelloMoonFragment extends Fragment {
 				@Override
 				public void onClick(View view) {
 					Log.d(TAG, "about to call play");
-					if(mPlayer == null){
-						Log.e(TAG, "I HAVE NO PLAYER");
-					}
 					mPlayer.play(getActivity());
+				}
+			}
+		);
+		
+		// handle pause button
+		mPauseButton = (Button)v.findViewById(R.id.hellomoon_pauseButton);
+		mPauseButton.setOnClickListener(new OnClickListener() 
+			{
+				@Override
+				public void onClick(View v) {
+					Log.d(TAG, "about to call pause");
+					mPlayer.pause();
 				}
 			}
 		);
