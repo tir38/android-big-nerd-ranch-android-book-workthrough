@@ -6,6 +6,8 @@ import android.util.Log;
 
 public class AudioPlayer {
 	
+	// my custom player to handle audio and interface with native MediaPlayer object
+	
 	// NOTE on pausing: I don't want to pause the MediaPlayer indefinitely.
 	// So, I "pause" the AudioPlayer by pausing MediaPlayer, getting the current position of the MediaPlayer, 
 	// save that position to AudioPlayer.mPosition. Then on "play" I either start or resume from mPosition.
