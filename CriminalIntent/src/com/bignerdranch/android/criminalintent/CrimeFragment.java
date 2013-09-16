@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
+
 //REMEMBER: this is a controller: controlling the view of a single crime!
 
 public class CrimeFragment extends Fragment {
@@ -26,10 +28,16 @@ public class CrimeFragment extends Fragment {
 	private Crime mCrime;
 	private EditText mTitleField;
 	private Button mDateButton;
+	private Button mTimeButton;
 	private CheckBox mSolvedCheckBox;
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
+	
 	public static final String DIALOG_DATE = "date";
-	public static final int REQUEST_DATE = 0; 			// for target fragment
+	public static final int REQUEST_DATE = 0;
+	
+	public static final String DIALOG_TIME = "time";
+	public static final int REQUEST_TIME = 1;
+	
 	private static final String TAG = "CriminalIntent";	// for debugging
 
 	// instantiate a new CrimeFragment based on a crime's ID
@@ -56,7 +64,6 @@ public class CrimeFragment extends Fragment {
 		mCrime = CrimeLab.get(getActivity()).getCrime(crimeID);
 	}
 	
-	@SuppressWarnings("static-access")
 	@Override
 	public View onCreateView(LayoutInflater inflater, 
 							 ViewGroup parent, 
@@ -92,15 +99,14 @@ public class CrimeFragment extends Fragment {
 		// handle mDateButton
 		mDateButton = (Button)v.findViewById(R.id.crime_date);
 		updateDateText(mCrime.getDate());
-//		mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", mCrime.getDate()).toString()); // format display
 		mDateButton.setOnClickListener(new View.OnClickListener() 
 			{ // anonymous inner class
 				public void onClick(View v){
 					FragmentManager fragmentManager = getActivity()
 														.getSupportFragmentManager(); 	// get fragManager of hosting activity
-					DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate()); // create new DatePickerFragment using crime date
-					dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-					dialog.show(fragmentManager, DIALOG_DATE); 							// show this fragment, and set its tag to the string contained in DIALOG_DATE
+					DatePickerFragment dateDialog = DatePickerFragment.newInstance(mCrime.getDate()); // create new DatePickerFragment using crime date
+					dateDialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+					dateDialog.show(fragmentManager, DIALOG_DATE); 							// show this fragment, and set its tag to the string contained in DIALOG_DATE
 			
 					// It might seem odd that we are setting the DatePickerFragment's Tag here, and not in DatePickerFragment.java.
 					// But since we are instantiating DatePickerFragment here, we want to be able to set its tag here, too.
@@ -110,6 +116,23 @@ public class CrimeFragment extends Fragment {
 					// But since we need a DatePickerFragment ONLY when we click on the date field, we create it here.
 				}
 			}
+		);
+		
+		// handle mTimeButton
+		mTimeButton = (Button)v.findViewById(R.id.crime_time); // get view
+		updateTimeText(mCrime.getDate());
+		mTimeButton.setOnClickListener(new View.OnClickListener()   // set time button's onClickListener
+			{// anonymous inner class
+			
+				@Override
+				public void onClick(View v) {
+					FragmentManager fragmentManager = getActivity()
+														.getSupportFragmentManager(); // get fragManager of the hosting activity
+					TimePickerFragment timeDialog = TimePickerFragment.newInstance(mCrime.getDate()); // instantiate a TimePickerFragment
+					timeDialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME); 	 // set TimePickerFragment's target fragment
+					timeDialog.show(fragmentManager, DIALOG_TIME);
+				}
+			}// end anonymous inner class
 		);
 		
 		// handle mSolvedCheckBox;
@@ -127,22 +150,40 @@ public class CrimeFragment extends Fragment {
 		return v;															// return view
 	}
 
-	// receive data from DatePickerFragment 
+	// receive data from DatePickerFragment and TimePickerFragment
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		if(resultCode != Activity.RESULT_OK) return;
+		
+		// if coming from DatePicker
 		if(requestCode == REQUEST_DATE) {
 			Date date = (Date)data
 								.getSerializableExtra(DatePickerFragment.EXTRA_DATE); // get date from intent
 			mCrime.setDate(date); // set crime's date
-//			mDateButton.setText(mCrime.getDate().toString()); // update date button's text TODO: replace with formatted date
 			updateDateText(mCrime.getDate());
+		}
+		
+		// if coming from TimePicker
+		if(requestCode == REQUEST_TIME){
+			Date date = (Date)data.
+								getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+			mCrime.setDate(date);
+			updateTimeText(mCrime.getDate());
 		}
 	}
 
 	public void updateDateText(Date date){
-		mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", date).toString()); // format display
+		// decide to display "Today" or formatted date
+		if(android.text.format.DateUtils.isToday(date.getTime())){
+			mDateButton.setText("Today");
+		}
+		else{
+			mDateButton.setText(DateFormat.format("EEEE, MMM dd, yyyy", date).toString()); // format display text
+		}
 	}
 	
+	public void updateTimeText(Date date){
+		mTimeButton.setText(DateFormat.format("hh:mm aa", date).toString()); // format display text
+	}
 
 }

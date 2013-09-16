@@ -15,4 +15,7 @@
     <!--  date picker strings -->
     <string name="date_picker_title" >Date of crime:</string>
     
+    <!-- time picker strings -->
+    <string name="time_picker_title">Time of crime:</string>
+    
 </resources>

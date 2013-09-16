@@ -3,6 +3,8 @@ package com.bignerdranch.android.criminalintent;
 import java.util.Date;
 import java.util.UUID;
 
+import android.text.format.Time;
+
 public class Crime {
 	private UUID mID;
 	private String mTitle;
@@ -42,7 +44,7 @@ public class Crime {
 	public void setSolved(boolean isSolved) {
 		mSolved = isSolved;
 	}
-	
+
 	@Override
 	public String toString(){
 		return mTitle;

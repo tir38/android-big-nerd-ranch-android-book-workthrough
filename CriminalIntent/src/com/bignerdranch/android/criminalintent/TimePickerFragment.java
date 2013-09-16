@@ -12,66 +12,65 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.DatePicker;
-import android.widget.DatePicker.OnDateChangedListener;
+import android.widget.TimePicker;
+import android.widget.TimePicker.OnTimeChangedListener;
 
 
-public class DatePickerFragment extends DialogFragment {
+public class TimePickerFragment extends DialogFragment {
 	private Date mDate;
 	private int mHour;
 	private int mMinute;
 	private int mDay;
 	private int mMonth;
 	private int mYear;
-
-	public static final String EXTRA_DATE = "com.bignerdranch.android.criminalintent.date";
+	
+	public static final String EXTRA_TIME = "com.bignerdranch.android.criminalIntent.time";
 	private static final String TAG = "CriminalIntent";	// for debugging
-
-	public static DatePickerFragment newInstance(Date date){
-		// create a bundle for this instance and add an argument
-		Bundle arguments = new Bundle();
-		arguments.putSerializable(EXTRA_DATE, date);
-
-		// create a new DatePickerFragment and set its bundle
-		DatePickerFragment datePickerFragment = new DatePickerFragment();
-		datePickerFragment.setArguments(arguments);
+	
+	public static TimePickerFragment newInstance(Date date){
+		Bundle arguments = new Bundle(); 				// create bundle for this fragment
+		arguments.putSerializable(EXTRA_TIME, date); 	// add time argument to bundle
+	
+		TimePickerFragment timePickerFragment = new TimePickerFragment();
+		timePickerFragment.setArguments(arguments);
 		
-		return datePickerFragment;
+		return timePickerFragment;
 	}
 	
-	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState){
 		// this is called by the fragment manager of the host activity
 		
-		// remember: you have to inflate a view before you can set it w/ setView(.)
-		View view = getActivity().getLayoutInflater()
-				.inflate(R.layout.dialog_date, null);
-
-		// get date from bundle
-		mDate = (Date)getArguments().getSerializable(EXTRA_DATE);
+		// inflate the dialog view
+		View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_time, null);
 		
+		// get date from bundle
+		mDate = (Date)getArguments().getSerializable(EXTRA_TIME); // get from bundle
+
 		burstDate(); // split date into components
 		
-		// create DatePicker widget
-		DatePicker datePicker = (DatePicker)view.findViewById(R.id.dialog_date_datePicker);
-		datePicker.init(mYear, mMonth, mDay, new OnDateChangedListener() // this listener updates mDate and date argument EVERY time the date changes (i.e. as user scroll through day, month, or year)
-			{ // anonymous inner class
-				public void onDateChanged(DatePicker view, int year, int month, int day){					
-					mDay = day;
-					mMonth = month;
-					mYear = year;
+		// create TimePicker widget, set its change listener
+		TimePicker timePicker = (TimePicker)view.findViewById(R.id.dialog_date_datePicker);		
+		timePicker.setOnTimeChangedListener(new OnTimeChangedListener()
+			{// anonymous inner class
+				public void onTimeChanged(TimePicker view, int hourOfDay, int minute){
+					// update both the dialog and the TimePickerFragment's member variables
+					// WTF: this is automatically preserving across rotations, why?
+					
+					// set hour/minute from alert dialog
+					mHour = hourOfDay;
+					mMinute = minute;
 					rebuildDate();
-
+					
 					// update argument to preserved selected value on rotation
-					getArguments().putSerializable(EXTRA_DATE, mDate);
+					getArguments().putSerializable(EXTRA_TIME, mDate);
 				}
-			}// end anonymous inner class
+			}
 		);
 		
 		// handle AlertDialog
 		return new AlertDialog.Builder(getActivity())				// construct AlertDialog from host activity
 				.setView(view) 										// set its view
-				.setTitle(R.string.date_picker_title)				// set its title
+				.setTitle(R.string.time_picker_title)				// set its title
 				.setPositiveButton(									// set ok button
 						android.R.string.ok,							// set onclick listener for ok button
 						new DialogInterface.OnClickListener()
@@ -83,21 +82,22 @@ public class DatePickerFragment extends DialogFragment {
 						)
 				.create();											// create the whole thing
 	}
-
-	// return results back to target fragment
+	
+	// send result back to target fragment
 	private void sendResult(int resultCode){
+		// check if target fragment is set
 		if (getTargetFragment() == null){
 			return;
 		}
-		// create new intent; add date as extra
-		Intent intent = new Intent();
-		intent.putExtra(EXTRA_DATE, mDate);
 		
-		// pass intent back to target fragment (i.e. CrimeFragment)
-		getTargetFragment()
-			.onActivityResult(getTargetRequestCode(), resultCode, intent);
-	}
+		// create new intent and add time as extra
+		Intent intent = new Intent();
+		intent.putExtra(EXTRA_TIME, mDate);
 
+		// send intent back to target fragment
+		getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+	}
+	
 	private void burstDate(){
 		// burst date into year/month/day/hour/minute, using Calendar object
 		Calendar calendar = Calendar.getInstance();
@@ -115,3 +115,5 @@ public class DatePickerFragment extends DialogFragment {
 		mDate = calender.getTime(); // this is a poorly named method; it is getting the date+time, basically it is just converting Calender -> Date
 	}
 }
+
+
