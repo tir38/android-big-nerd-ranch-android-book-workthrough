@@ -95,7 +95,9 @@ public class DatePickerFragment extends DialogFragment {
 		
 		// pass intent back to target fragment (i.e. CrimeFragment)
 		getTargetFragment()
-			.onActivityResult(getTargetRequestCode(), resultCode, intent);
+			.onActivityResult(getTargetRequestCode(), resultCode, intent); // SUPER IMPORTANT: you are calling the target fragment's onActivityResult method
+																			// i.e. CrimeFragment.onActivityResult()
+																			// also, getTargetRequestCode() will return the unique Request code that the TargetFragment assigned THIS fragment
 	}
 
 	private void burstDate(){

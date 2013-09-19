@@ -2,16 +2,20 @@ package com.bignerdranch.android.criminalintent;
 import java.util.Date;
 import java.util.UUID;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,18 +24,22 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
-
 //REMEMBER: this is a controller: controlling the view of a single crime!
 
 public class CrimeFragment extends Fragment {
 
+	// ================== variables ========================================================================
+	// member variables
 	private Crime mCrime;
 	private EditText mTitleField;
 	private Button mDateButton;
 	private Button mTimeButton;
 	private CheckBox mSolvedCheckBox;
+	
+	// extras
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
 	
+	// dialog and request values
 	public static final String DIALOG_DATE = "date";
 	public static final int REQUEST_DATE = 0;
 	
@@ -53,17 +61,25 @@ public class CrimeFragment extends Fragment {
 		return crimeFragment;
 	}
 	
+	
+	//================== on state change methods ======================================================
 	@Override	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState); // call super method
 		
 		mCrime = new Crime();				// instantiate new Crime
 		
-		// get crime ID from CrimeFragment's bundle
-		UUID crimeID = (UUID)getArguments().getSerializable(EXTRA_CRIME_ID);
+		// get stuff from bundle
+		UUID crimeID 		= (UUID)getArguments().getSerializable(EXTRA_CRIME_ID);
+
+		// set crime ID from CrimeFragment's bundle
 		mCrime = CrimeLab.get(getActivity()).getCrime(crimeID);
+
+		// tell fragment manager this fragment has an options menu
+		setHasOptionsMenu(true);
 	}
 	
+	@TargetApi(11)
 	@Override
 	public View onCreateView(LayoutInflater inflater, 
 							 ViewGroup parent, 
@@ -147,9 +163,33 @@ public class CrimeFragment extends Fragment {
 			} // end anonymous inner class for listener
 		);
 		
+		// if high enough API, and if parent activity set, then set home button as up button
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){ 
+			if(NavUtils.getParentActivityIntent(getActivity()) != null){
+				getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+			}
+		}
+		
 		return v;															// return view
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem menuItem){
+		switch( menuItem.getItemId()){
+			case android.R.id.home:
+
+				// if parent activity is set, navigate up to parent
+				if(NavUtils.getParentActivityIntent(getActivity()) != null){
+					NavUtils.navigateUpFromSameTask(getActivity());
+				}
+				
+				return true;
+				
+			default:
+				return super.onOptionsItemSelected(menuItem);
+		}
+	}
+	
 	// receive data from DatePickerFragment and TimePickerFragment
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -171,7 +211,9 @@ public class CrimeFragment extends Fragment {
 			updateTimeText(mCrime.getDate());
 		}
 	}
-
+	
+	
+	// ================== helper methods ======================================================
 	public void updateDateText(Date date){
 		// decide to display "Today" or formatted date
 		if(android.text.format.DateUtils.isToday(date.getTime())){

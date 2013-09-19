@@ -16,19 +16,13 @@ public class CrimeLab {
 	private ArrayList<Crime> mCrimes;
 	private static final String TAG = "CriminalIntent";	
 
-	private CrimeLab(Context appContext){ // constructor
+	// constructor
+	private CrimeLab(Context appContext){ 
 		mAppContext = appContext;
 		mCrimes = new ArrayList<Crime>();
-		
-		// for now, populate crime list with 100 boring crimes
-		for (int i = 0; i < 100; i++){	
-			Crime c = new Crime();		// create new crime
-			c.setTitle("Crime #" + i); 	// set title
-			c.setSolved(i% 2 == 0); 	// set every other one as solved
-			mCrimes.add(c); 			// add crime to list
-		}
 	}
 
+	// get crimeLab singleton
 	public static CrimeLab get(Context c){
 		// if crime lab instance doesn't *yet* exist...
 		if (sCrimeLab == null){
@@ -54,6 +48,12 @@ public class CrimeLab {
 		// if you get here, crime was not found
 		Log.w(TAG, "crime not found!");
 		return null;
+	}
+	
+	// add a new Crime to array list
+	public void  addCrime(Crime crime){
+		Log.d(TAG, "adding crime");
+		mCrimes.add(crime);
 	}
 	
 }
