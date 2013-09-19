@@ -8,14 +8,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.format.DateFormat;
+import android.text.style.BulletSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +28,7 @@ public class CrimeListFragment extends ListFragment {
 	// member variables
 	private boolean mIsSubtitleVisible;
 	private ArrayList<Crime> mCrimes;
+	private ImageButton mAddNewCrimeButon;
 	
 	// extra string(s)
 	public static final String EXTRA_IS_SUBTITLE_VISIBLE = "com.bignerdranch.android.criminalintent.is_subtitle_visible";
@@ -55,12 +60,13 @@ public class CrimeListFragment extends ListFragment {
 		mIsSubtitleVisible = false; // initialize to false
 	}
 	
-	@TargetApi(11)
+	@TargetApi(16)
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 								ViewGroup parent,
 								Bundle onSavedInstanceState){
-		View view = super.onCreateView(inflater, parent, onSavedInstanceState); // get the view of parent activity
+//		View view = super.onCreateView(inflater, parent, onSavedInstanceState); // get the view of parent activity
+		View view = inflater.inflate(R.layout.fragment_crime_list, parent, false);
 		
 		// if right SDK and is turned on, then display action bar subtitle
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD){
@@ -68,6 +74,22 @@ public class CrimeListFragment extends ListFragment {
 				getActivity().getActionBar().setSubtitle(R.string.subtitle);
 			}
 		}
+		
+		// set the empty view's button action to start a new crime
+		mAddNewCrimeButon = (ImageButton)view.findViewById(R.id.new_crime_button);
+		
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+			mAddNewCrimeButon.setBackground(null); // make backgroud transparent if SDK OK
+		}
+		mAddNewCrimeButon.setOnClickListener(new OnClickListener() 
+			{ // anonymous inner class
+				@Override
+				public void onClick(View v) {
+					startNewCrime(); 
+				}
+			}
+		);
+		
 		return view;
 	}
 						
@@ -107,11 +129,12 @@ public class CrimeListFragment extends ListFragment {
 	public boolean onOptionsItemSelected(MenuItem menuItem){
 		switch (menuItem.getItemId()){
 			case R.id.menu_item_new_crime:
-				Crime crime = new Crime();												// instantiate new crime
-				CrimeLab.get(getActivity()).addCrime(crime); 							// get crimelab singleton and add crime
-				Intent intent = new Intent(getActivity(), CrimePagerActivity.class); 	// start crime pager activity for new (blank) crime (which starts CrimeFragment)
-				intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());			// pass CrimeFragment which crime ID to display
-				startActivityForResult(intent, crimeFragmentRequestCode); 				// pass crimeFragment its results code
+//				Crime crime = new Crime();												// instantiate new crime
+//				CrimeLab.get(getActivity()).addCrime(crime); 							// get crimelab singleton and add crime
+//				Intent intent = new Intent(getActivity(), CrimePagerActivity.class); 	// start crime pager activity for new (blank) crime (which starts CrimeFragment)
+//				intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());			// pass CrimeFragment which crime ID to display
+//				startActivityForResult(intent, crimeFragmentRequestCode); 				// pass crimeFragment its results code
+				startNewCrime();
 				return true;
 				
 			case R.id.menu_item_show_subtitle:
@@ -132,6 +155,15 @@ public class CrimeListFragment extends ListFragment {
 			default:
 				return super.onOptionsItemSelected(menuItem);
 		}
+	}
+
+	// there are several ways to trigger the add a new crime steps, so put them all together
+	private void startNewCrime(){
+		Crime crime = new Crime();												// instantiate new crime
+		CrimeLab.get(getActivity()).addCrime(crime); 							// get crimelab singleton and add crime
+		Intent intent = new Intent(getActivity(), CrimePagerActivity.class); 	// start crime pager activity for new (blank) crime (which starts CrimeFragment)
+		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());			// pass CrimeFragment which crime ID to display
+		startActivityForResult(intent, crimeFragmentRequestCode); 				// pass crimeFragment its results code
 	}
 	
 	// =================== inner class to handle Crime adapter =================== 

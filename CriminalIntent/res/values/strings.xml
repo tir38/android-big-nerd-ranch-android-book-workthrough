@@ -3,23 +3,13 @@
 
     <string name="app_name">CriminalIntent</string>
     <string name="crime_title_hint">Enter a title for the crime.</string>
-
-    <!-- crime fragment strings; these might be used elsewhere later -->
     <string name="crime_title_label">Title</string>
     <string name="crime_description_label">Description</string>
     <string name="crime_solved_label">Solved?</string>
-
-    <!-- crimes fragment strings -->
     <string name="crimes_title">Crimes</string>
-    
-    <!--  date picker strings -->
-    <string name="date_picker_title" >Date of crime:</string>
-    
-    <!-- time picker strings -->
+    <string name="date_picker_title" >Date of crime:</string>    
     <string name="time_picker_title">Time of crime:</string>
-
-    
-    <!--  menu strings -->
+    <string name="new_crime_button_description">Click to add a new crime.</string>
     <string name="new_crime">New Crime</string>
     <string name="show_subtitle">Show Subtitle</string>
     <string name="hide_subtitle">Hide Subtitle</string>
