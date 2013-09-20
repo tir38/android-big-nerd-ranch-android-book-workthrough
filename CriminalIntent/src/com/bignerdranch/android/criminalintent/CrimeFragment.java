@@ -48,6 +48,7 @@ public class CrimeFragment extends Fragment {
 	
 	private static final String TAG = "CriminalIntent";	// for debugging
 
+	//================== methods ======================================================
 	// instantiate a new CrimeFragment based on a crime's ID
 	public static CrimeFragment newInstance(UUID crimeID){
 		// create a bundle for this instance
@@ -61,8 +62,7 @@ public class CrimeFragment extends Fragment {
 		return crimeFragment;
 	}
 	
-	
-	//================== on state change methods ======================================================
+	// ------- on state change methods -------
 	@Override	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState); // call super method
@@ -212,8 +212,14 @@ public class CrimeFragment extends Fragment {
 		}
 	}
 	
+	@Override
+	public void onPause(){
+		super.onPause(); 			// call to super method
+		CrimeLab.get(getActivity()) // get crimelab singleton
+					.saveCrimes(); 	// save crimes
+	}
 	
-	// ================== helper methods ======================================================
+	// ------- helper methods -------
 	public void updateDateText(Date date){
 		// decide to display "Today" or formatted date
 		if(android.text.format.DateUtils.isToday(date.getTime())){
