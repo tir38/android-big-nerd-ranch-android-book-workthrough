@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 public class CrimeListFragment extends ListFragment {
 
+    // ================= variables ====================
 	// member variables
 	private boolean mIsSubtitleVisible;
 	private ArrayList<Crime> mCrimes;
@@ -27,7 +29,8 @@ public class CrimeListFragment extends ListFragment {
 	
 	// for debugging
 	private static final String TAG = "CriminalIntent";	
-	
+
+    // ============= methods =========================
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState); // call super-class method
@@ -78,13 +81,76 @@ public class CrimeListFragment extends ListFragment {
 				}
 			}
 		);
-		
+
+        // setup Context menu
+        ListView listView = (ListView)view.findViewById(android.R.id.list);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
+            // use floating context menus for pre-honeycomb versions
+            registerForContextMenu(listView);
+        }
+        else{
+            // use context action bar for honeycomb+ versions
+            listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+            listView.setMultiChoiceModeListener( new AbsListView.MultiChoiceModeListener() {
+                // anonymous inner class
+
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                    // required, but not used
+                }
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    // inflate action-mode menu
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.crime_list_item_context, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                    // required, but not used
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    // switch based on what item is clicked
+                    switch(item.getItemId()){
+                        case R.id.menu_item_delete_crime: // if delete selected
+                            CrimeAdapter adapter = (CrimeAdapter)getListAdapter();  // get list's adapter
+                            CrimeLab crimeLab = CrimeLab.get(getActivity());        // get crimelab singleton
+                            for(int i = adapter.getCount()-1; i >= 0; i--){         // for each crime (checked or not)
+                                // work backwards so that index is preserved at each delete
+                                if(getListView().isItemChecked(i)){
+                                    crimeLab.deleteCrime(adapter.getItem(i));
+                                }
+                            }
+                            mode.finish();
+                            adapter.notifyDataSetChanged();
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+                    // required, but not used
+                }
+            });
+        }
+
 		return view;
 	}
 						
 	
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id){
+	public void onListItemClick(ListView l,
+                                View v,
+                                int position,
+                                long id){
 		Crime crime = ((CrimeAdapter)getListAdapter()).getItem(position); // get a crime using my custom adapter
 		
 		// create intent and start a CrimePagerActivity
@@ -93,14 +159,15 @@ public class CrimeListFragment extends ListFragment {
 		startActivity(intent);
 	}
 
-	// override onResume to update list any time the fragment resumes when returning from CrimeActivity
+	// update list any time the fragment resumes when returning from CrimeActivity
 	@Override
 	public void onResume(){
 		super.onResume(); // call super class method
 		((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
 	}
 	
-	@Override
+	// ------ handle options menu ------
+    @Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
 		super.onCreateOptionsMenu(menu, inflater); 				// call super class
 		inflater.inflate(R.menu.fragment_crime_list, menu);		// inflate and populate menu
@@ -145,6 +212,32 @@ public class CrimeListFragment extends ListFragment {
 				return super.onOptionsItemSelected(menuItem);
 		}
 	}
+
+    // ------ handle context menu ------
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+        getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem menuItem){
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuItem.getMenuInfo(); // get context menu info
+        int position = info.position; // get position in list
+        CrimeAdapter adapter = (CrimeAdapter)getListAdapter(); // create new crime adapter, remember this is inner class
+        Crime crime = adapter.getItem(position); // get crime from list
+
+        // do specific task depending on which context item is selected
+        switch (menuItem.getItemId()){
+            case R.id.menu_item_delete_crime: // if delete selected
+                CrimeLab.get(getActivity())       // get crimelab singleton
+                        .deleteCrime(crime);        // and delete crime
+                adapter.notifyDataSetChanged();
+                return true;
+        }
+
+        Log.e(TAG, "Error: crime delete failed");
+        return super.onContextItemSelected(menuItem); // TODO: what is this doing?
+    }
 
 	// there are several ways to trigger the add a new crime steps, so put them all together
 	private void startNewCrime(){

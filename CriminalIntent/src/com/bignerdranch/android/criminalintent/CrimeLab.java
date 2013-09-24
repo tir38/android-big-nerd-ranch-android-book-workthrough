@@ -115,6 +115,10 @@ public class CrimeLab {
 		}
 	}
 	
-	
+	// delete a crime from ArrayList
+    public void deleteCrime(Crime crime){
+        mCrimes.remove(crime); // will automatically find crime in arraylist and delete, reindexes all entries after removed
+    }
+
 	// build 
 }

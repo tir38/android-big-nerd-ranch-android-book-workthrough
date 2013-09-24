@@ -8,4 +8,4 @@ HelloMoon/gen/*
 HelloMoon/bin/*
 AndroidProgramming
 *.iws
-*.idea/workspace.xml
+*/.idea/workspace.xml
