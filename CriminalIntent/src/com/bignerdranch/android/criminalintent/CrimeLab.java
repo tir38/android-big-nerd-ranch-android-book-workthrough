@@ -1,17 +1,22 @@
 package com.bignerdranch.android.criminalintent;
 
-import java.io.IOException;
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
-
-import org.json.JSONException;
-
-import android.content.Context;
-import android.util.Log;
 
 
 // REMEMBER: this is a singleton
 // ... just define constructor and get method that returns instance
+
+// NOTE: file location
+// I want to have an all or nothing approach.
+// If I have external storage, use it for save AND load.
+// If I load from external storage, and find no file, then create new array.
+// Don't go looking for it in local storage.
 
 public class CrimeLab {
 	// ==================== variables =================
@@ -24,18 +29,32 @@ public class CrimeLab {
 	// string constants
 	private static final String TAG = "CriminalIntent";	
 	private static final String FILENAME = "crimes.json";
-
+	
 	
 	// ==================== methods =================
 	// constructor
 	private CrimeLab(Context appContext){ 
-		mAppContext = appContext;				
-		mSerializer = new CriminalIntentJSONSerializer(mAppContext, FILENAME); // define serializer
-		// two approaches, different outcome:	
+		mAppContext = appContext;			
+		
+		// check for external storage, if so, use serializer with different filename
+		String externalStorageState = Environment.getExternalStorageState();
+		Log.d(TAG, "external storage state : " + externalStorageState);
+		if (Environment.MEDIA_MOUNTED.equals(externalStorageState)){ 						// if external storage available, use it
+			File  dataDirectory = Environment.getExternalStorageDirectory();
+			String externalFilename = dataDirectory.getAbsolutePath() + "/" + FILENAME;
+
+			mSerializer = new CriminalIntentJSONSerializer(mAppContext, externalFilename);
+			Log.d(TAG, "using external storage : " + externalFilename);
+		}
+		else{ 																				// else, use 'internal' storage
+			mSerializer = new CriminalIntentJSONSerializer(mAppContext, FILENAME);
+			Log.d(TAG, "using internal storage");
+		}
+		
+		// load crimes: two approaches, different outcome:	
 		// By using if/else, I risk that if mCrimes is not empty, it will try to load file. If load file then fails, I am left with nothing.
 		// It won't then "go back" and create me an empty ArrayList.
 		// However by using try/catch I guarantee that if load fails, I always get a new empty ArrayList.
-
 //		// if mCrimes is empty
 //		if (mCrimes.isEmpty()){
 //			mCrimes = new ArrayList<Crime>();
@@ -43,7 +62,6 @@ public class CrimeLab {
 //		else{
 //			mCrimes = mSerializer.loadCrimes();
 //		}
-		
 		try{
 			mCrimes = mSerializer.loadCrimes();
 		}

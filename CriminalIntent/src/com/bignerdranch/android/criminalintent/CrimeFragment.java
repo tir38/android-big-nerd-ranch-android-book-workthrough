@@ -1,6 +1,4 @@
 package com.bignerdranch.android.criminalintent;
-import java.util.Date;
-import java.util.UUID;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,7 +11,6 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +20,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+
+import java.util.Date;
+import java.util.UUID;
 
 //REMEMBER: this is a controller: controlling the view of a single crime!
 

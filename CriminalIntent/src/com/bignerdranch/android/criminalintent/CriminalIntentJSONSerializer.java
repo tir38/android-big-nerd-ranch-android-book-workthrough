@@ -1,21 +1,12 @@
 package com.bignerdranch.android.criminalintent;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-
+import android.content.Context;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
 
-import android.content.Context;
-import android.util.Log;
+import java.io.*;
+import java.util.ArrayList;
 
 public class CriminalIntentJSONSerializer {
 	private Context mContext;
@@ -38,11 +29,15 @@ public class CriminalIntentJSONSerializer {
 		// write the file to disk
 		Writer writer = null;				// create new Writer
 		try{								// try to save JSONarray to file
-			OutputStream out = mContext	
-								.openFileOutput(mFilename, Context.MODE_PRIVATE);
-			writer = new  OutputStreamWriter(out);
+//            // I can no longer use OutputStream because it doesn't take path in filename
+//			OutputStream out = mContext
+//								.openFileOutput(mFilename, Context.MODE_PRIVATE);
+            // instead I have to use FileOutputStream (which extends FileOutputStream) and can take in path in filename
+            FileOutputStream out = new FileOutputStream(mFilename);     // create new FileOutputStream
+            writer = new OutputStreamWriter(out);
 			writer.write(array.toString());
-		}
+
+        }
 		finally{
 			if(writer != null)
 				writer.close();
@@ -55,9 +50,11 @@ public class CriminalIntentJSONSerializer {
 		BufferedReader reader = null;						// create file reader
 		try{
 			// open and read the file into a StringBuilder
-			InputStream inputStream = mContext.openFileInput(mFilename);  		// create input stream
-			reader = new BufferedReader(new InputStreamReader(inputStream)); 	// set reader's input stream
-			StringBuilder jsonStringBuilder = new StringBuilder(); 				// create new string builder
+//			InputStream inputStream = mContext.openFileInput(mFilename);  		// create input stream
+            FileInputStream inputStream = new FileInputStream(mFilename);       // have to use this instead; for external storage
+			reader = new BufferedReader(new InputStreamReader(inputStream)); 	// set reader's input stream, wrap in BufferedReader
+
+            StringBuilder jsonStringBuilder = new StringBuilder(); 				// create new string builder
 			String singleLine = null;
 			
 			while ((singleLine = reader.readLine()) != null){ // a lot going on in this line: reads a line from reader into singleLine, if this doesn't read in null then keep going
