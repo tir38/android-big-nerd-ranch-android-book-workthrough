@@ -11,15 +11,9 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.view.*;
+import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
 
 import java.util.Date;
 import java.util.UUID;
@@ -169,7 +163,69 @@ public class CrimeFragment extends Fragment {
 				getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 			}
 		}
-		
+
+        // handle context menu
+        LinearLayout linearLayout = (LinearLayout)v.findViewById(R.id.crime_entire_view);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
+            registerForContextMenu(linearLayout);// register this view to respond to longpress and display floating context menu
+        }
+        else {
+            linearLayout.setOnLongClickListener(new View.OnLongClickListener() {  // set onLongClickListener to launch action bar context menu
+                // anonymous inner class
+                @Override
+                public boolean onLongClick(View v) {
+
+                    // create instance of ActionMode
+                    getActivity().startActionMode(new ActionMode.Callback(){
+                        // double anonymous inner class
+                        @Override
+                        public boolean onCreateActionMode(ActionMode mode, Menu menu){
+                            // inflate action-mode menu
+                            MenuInflater inflater = mode.getMenuInflater();
+                            inflater.inflate(R.menu.crime_context, menu);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onPrepareActionMode(ActionMode mode, Menu menu){
+                            // required, but not used
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem){
+                            // TODO DRY this up: can I just call onContextItemSelected(.) ?
+                            switch(menuItem.getItemId()){
+                                case (R.id.menu_delete_crime):// if selected delete
+                                    // get crimelab singleton, call delete on this crime
+                                    CrimeLab.get(getActivity()).deleteCrime(mCrime);
+
+                                    // navigate back up to CrimeListFragment
+                                    if(NavUtils.getParentActivityIntent(getActivity()) != null){ // if parent activity is set ...
+                                        NavUtils.navigateUpFromSameTask(getActivity()); // ... navigate up to parent
+                                    }
+
+                                    return true;
+
+                                default:
+                                    return false;
+                            }
+                        }
+
+                        @Override
+                        public void onDestroyActionMode(ActionMode mode){
+                            // required, but not used
+                        }
+                    });
+
+                    return false;
+                }
+            });
+
+            // remember: unlike CrimeListFragment, I don't need to use multiple selection mode; I am only trying to delete ONE crime
+
+        }
+
 		return v;															// return view
 	}
 
@@ -218,7 +274,37 @@ public class CrimeFragment extends Fragment {
 		CrimeLab.get(getActivity()) // get crimelab singleton
 					.saveCrimes(); 	// save crimes
 	}
-	
+
+    // ------- context menu handlers -------
+    @Override
+    public void onCreateContextMenu(ContextMenu menu,
+                                    View view,
+                                    ContextMenu.ContextMenuInfo menuInfo){
+        getActivity()
+                .getMenuInflater()
+                .inflate(R.menu.crime_context, menu); // inflate menu
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem menuItem){
+        // TODO
+        switch(menuItem.getItemId()){
+            case (R.id.menu_delete_crime):// if selected delete
+                // get crimelab singleton, call delete on this crime
+                CrimeLab.get(getActivity()).deleteCrime(mCrime);
+
+                // navigate back up to CrimeListFragment
+                if(NavUtils.getParentActivityIntent(getActivity()) != null){ // if parent activity is set ...
+                    NavUtils.navigateUpFromSameTask(getActivity()); // ... navigate up to parent
+                }
+
+                return true;
+
+            default:
+                return super.onContextItemSelected(menuItem);
+        }
+    }
+
 	// ------- helper methods -------
 	public void updateDateText(Date date){
 		// decide to display "Today" or formatted date

@@ -116,6 +116,8 @@ public class CrimeListFragment extends ListFragment {
                 @Override
                 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                     // switch based on what item is clicked
+
+                    // TODO DRY THIS UP: why don't i just pass MenuItem to onContextItemSelected(.)?
                     switch(item.getItemId()){
                         case R.id.menu_item_delete_crime: // if delete selected
                             CrimeAdapter adapter = (CrimeAdapter)getListAdapter();  // get list's adapter
