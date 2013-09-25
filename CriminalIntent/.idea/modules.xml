@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CriminalIntent.iml" filepath="$PROJECT_DIR$/CriminalIntent.iml" />
+      <module fileurl="file://$USER_HOME$/development/actionbarsherlock/actionbarsherlock/actionbarsherlock.iml" filepath="$USER_HOME$/development/actionbarsherlock/actionbarsherlock/actionbarsherlock.iml" />
       <module fileurl="file://$USER_HOME$/development/sdk/extras/android/support/v4/src/tests/tests.iml" filepath="$USER_HOME$/development/sdk/extras/android/support/v4/src/tests/tests.iml" />
       <module fileurl="file://$USER_HOME$/development/sdk/extras/android/support/v4/src/v4.iml" filepath="$USER_HOME$/development/sdk/extras/android/support/v4/src/v4.iml" />
     </modules>
