@@ -9,4 +9,11 @@
 		android:showAsAction="ifRoom|withText"
 	/>
     
+    <item
+        android:id="@+id/menu_item_show_subtitle"
+        android:title="@string/show_subtitle"
+        android:showAsAction="ifRoom"
+    />
+    
 </menu>
+<!-- for v11 -->

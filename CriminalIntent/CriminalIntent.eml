@@ -3,6 +3,6 @@
 	<exclude-output/>
 	<contentEntry url="file://$MODULE_DIR$"/>
 	<levels>
-		<level name="android-support-v4" value="project"/>
+		<level name="android-support-v42" value="project"/>
 	</levels>
 </component>

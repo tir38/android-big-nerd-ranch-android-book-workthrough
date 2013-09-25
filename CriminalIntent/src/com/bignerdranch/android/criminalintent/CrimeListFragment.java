@@ -4,16 +4,16 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
+import com.actionbarsherlock.app.SherlockListFragment;
 
 import java.util.ArrayList;
 
-public class CrimeListFragment extends ListFragment {
+public class CrimeListFragment extends SherlockListFragment {
 
     // ================= variables ====================
 	// member variables
@@ -61,11 +61,12 @@ public class CrimeListFragment extends ListFragment {
 		View view = inflater.inflate(R.layout.fragment_crime_list, parent, false);
 		
 		// if right SDK and is turned on, then display action bar subtitle
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD){
+        // ABS should allow actionbar on all devices
+//		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD){
 			if(mIsSubtitleVisible){
-				getActivity().getActionBar().setSubtitle(R.string.subtitle);
+				getSherlockActivity().getSupportActionBar().setSubtitle(R.string.subtitle);
 			}
-		}
+//		}
 		
 		// set the empty view's button action to start a new crime
 		mAddNewCrimeButon = (ImageButton)view.findViewById(R.id.new_crime_button);
@@ -168,11 +169,12 @@ public class CrimeListFragment extends ListFragment {
 	
 	// ------ handle options menu ------
     @Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+	public void onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu,
+                                    com.actionbarsherlock.view.MenuInflater inflater){
 		super.onCreateOptionsMenu(menu, inflater); 				// call super class
 		inflater.inflate(R.menu.fragment_crime_list, menu);		// inflate and populate menu
 
-		MenuItem showSubtitle = menu.findItem(R.id.menu_item_show_subtitle);// change menu item text
+		com.actionbarsherlock.view.MenuItem showSubtitle = menu.findItem(R.id.menu_item_show_subtitle);// change menu item text
 
 		if(mIsSubtitleVisible && showSubtitle.getTitle() != null){ // if turned on AND currently showing title, display "hide"
 			showSubtitle.setTitle(R.string.hide_subtitle);
@@ -182,7 +184,7 @@ public class CrimeListFragment extends ListFragment {
 	
 	@TargetApi(11)
 	@Override
-	public boolean onOptionsItemSelected(MenuItem menuItem){
+	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem menuItem){
 		switch (menuItem.getItemId()){
 			case R.id.menu_item_new_crime:
 //				Crime crime = new Crime();												// instantiate new crime
@@ -195,13 +197,13 @@ public class CrimeListFragment extends ListFragment {
 				
 			case R.id.menu_item_show_subtitle:
 				// check if subtitle is already displayed, show or don't show
-				if(getActivity().getActionBar().getSubtitle() == null){				// if not displayed
-					getActivity().getActionBar().setSubtitle(R.string.subtitle);	// display subtitle
+				if(getSherlockActivity().getSupportActionBar().getSubtitle() == null){				// if not displayed
+					getSherlockActivity().getSupportActionBar().setSubtitle(R.string.subtitle);	// display subtitle
 					menuItem.setTitle(R.string.hide_subtitle);						// change menu item title to "hide subtitle"
 					mIsSubtitleVisible = true;										// update member variable
 				}
 				else{																// else	
-					getActivity().getActionBar().setSubtitle(null);					// remove subtitle
+					getSherlockActivity().getSupportActionBar().setSubtitle(null);					// remove subtitle
 					menuItem.setTitle(R.string.show_subtitle); 						// change menu item title to "show subtitle"
 					mIsSubtitleVisible = false;										// update member variable
 					//TODO: this doesn't get preserved across rotation
