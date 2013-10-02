@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalintent;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -29,6 +31,7 @@ public class CrimeFragment extends Fragment {
 	private Button mDateButton;
 	private Button mTimeButton;
 	private CheckBox mSolvedCheckBox;
+    private ImageButton mPhotoButton;
 	
 	// extras
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
@@ -81,7 +84,7 @@ public class CrimeFragment extends Fragment {
 		
 		View v = inflater.inflate(R.layout.fragment_crime, parent, false); 	// inflate view
 		
-		// handle mTitleField
+		// --- handle mTitleField
 		mTitleField = (EditText)v.findViewById(R.id.crime_title);		
 		mTitleField.setText(mCrime.getTitle()); // set text of crime' title
 		mTitleField.addTextChangedListener(new TextWatcher() 
@@ -106,7 +109,7 @@ public class CrimeFragment extends Fragment {
 			} // ends anonymous inner class
 		);
 		
-		// handle mDateButton
+		// --- handle mDateButton
 		mDateButton = (Button)v.findViewById(R.id.crime_date);
 		updateDateText(mCrime.getDate());
 		mDateButton.setOnClickListener(new View.OnClickListener() 
@@ -128,7 +131,7 @@ public class CrimeFragment extends Fragment {
 			}
 		);
 		
-		// handle mTimeButton
+		// --- handle mTimeButton
 		mTimeButton = (Button)v.findViewById(R.id.crime_time); // get view
 		updateTimeText(mCrime.getDate());
 		mTimeButton.setOnClickListener(new View.OnClickListener()   // set time button's onClickListener
@@ -145,7 +148,7 @@ public class CrimeFragment extends Fragment {
 			}// end anonymous inner class
 		);
 		
-		// handle mSolvedCheckBox;
+		// --- handle mSolvedCheckBox;
 		mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
 		mSolvedCheckBox.setChecked(mCrime.isSolved());
 		mSolvedCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
@@ -157,14 +160,14 @@ public class CrimeFragment extends Fragment {
 			} // end anonymous inner class for listener
 		);
 		
-		// if high enough API, and if parent activity set, then set home button as up button
+		// --- if high enough API, and if parent activity set, then set home button as up button
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){ 
 			if(NavUtils.getParentActivityIntent(getActivity()) != null){
 				getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 			}
 		}
 
-        // handle context menu
+        // --- handle context menu
         LinearLayout linearLayout = (LinearLayout)v.findViewById(R.id.crime_entire_view);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
             registerForContextMenu(linearLayout);// register this view to respond to longpress and display floating context menu
@@ -226,7 +229,25 @@ public class CrimeFragment extends Fragment {
 
         }
 
-		return v;															// return view
+        // --- handle photo image button
+        mPhotoButton = (ImageButton)v.findViewById(R.id.crime_photo_button);
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            // anonymous inner class
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), CrimeCameraActivity.class);// start crime camera activity with intent
+                startActivity(intent);
+            }
+        });
+
+        // if no camera is present on device, disable button
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA) &&              // if has no Front AND no rear camera....
+            !packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)){
+                mPhotoButton.setEnabled(false);                                             // ... disable button
+        }
+
+		return v;   // return view
 	}
 
 	@Override
@@ -287,7 +308,6 @@ public class CrimeFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem menuItem){
-        // TODO
         switch(menuItem.getItemId()){
             case (R.id.menu_delete_crime):// if selected delete
                 // get crimelab singleton, call delete on this crime

@@ -62,5 +62,14 @@
             android:text="@string/crime_solved_label" />
 
     </LinearLayout>
+
+    <!-- photo button -->
+    <ImageButton
+            android:id="@+id/crime_photo_button"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:src="@android:drawable/ic_menu_camera"
+            />
+
 </LinearLayout>
  

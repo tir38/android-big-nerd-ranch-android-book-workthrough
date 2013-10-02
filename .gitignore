@@ -9,3 +9,4 @@ HelloMoon/bin/*
 AndroidProgramming
 *.iws
 */.idea/workspace.xml
+*.apk
