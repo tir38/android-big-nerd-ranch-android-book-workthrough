@@ -35,13 +35,16 @@ public class CrimeFragment extends Fragment {
 	
 	// extras
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
-	
+
+
 	// dialog and request values
 	public static final String DIALOG_DATE = "date";
 	public static final int REQUEST_DATE = 0;
 	
 	public static final String DIALOG_TIME = "time";
 	public static final int REQUEST_TIME = 1;
+
+    public static final int REQUEST_PHOTO = 2;
 	
 	private static final String TAG = "CriminalIntent";	// for debugging
 
@@ -236,7 +239,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), CrimeCameraActivity.class);// start crime camera activity with intent
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_PHOTO);
             }
         });
 
@@ -244,7 +247,8 @@ public class CrimeFragment extends Fragment {
         PackageManager packageManager = getActivity().getPackageManager();
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA) &&              // if has no Front AND no rear camera....
             !packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)){
-                mPhotoButton.setEnabled(false);                                             // ... disable button
+            Log.d(TAG, "front AND rear cameras not found");
+            mPhotoButton.setEnabled(false);                                             // ... disable button
         }
 
 		return v;   // return view
@@ -287,6 +291,15 @@ public class CrimeFragment extends Fragment {
 			mCrime.setDate(date);
 			updateTimeText(mCrime.getDate());
 		}
+
+        // if coming from CrimeCameraFragment
+        if(requestCode == REQUEST_PHOTO) {
+            // create new Photo object and attach it to the Crime object
+            String filename = data.getStringExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
+            if (filename != null) {
+                Log.i(TAG, "filename = " + filename);
+            }
+        }
 	}
 	
 	@Override
