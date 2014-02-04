@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,10 +33,10 @@ public class CrimeFragment extends Fragment {
 	private Button mTimeButton;
 	private CheckBox mSolvedCheckBox;
     private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
 	
 	// extras
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.android.criminalintent.crime_id";
-
 
 	// dialog and request values
 	public static final String DIALOG_DATE = "date";
@@ -45,6 +46,8 @@ public class CrimeFragment extends Fragment {
 	public static final int REQUEST_TIME = 1;
 
     public static final int REQUEST_PHOTO = 2;
+
+    public static final String DIALOG_IMAGE = "image";
 	
 	private static final String TAG = "CriminalIntent";	// for debugging
 
@@ -70,7 +73,7 @@ public class CrimeFragment extends Fragment {
 		mCrime = new Crime();				// instantiate new Crime
 		
 		// get stuff from bundle
-		UUID crimeID 		= (UUID)getArguments().getSerializable(EXTRA_CRIME_ID);
+		UUID crimeID = (UUID)getArguments().getSerializable(EXTRA_CRIME_ID);
 
 		// set crime ID from CrimeFragment's bundle
 		mCrime = CrimeLab.get(getActivity()).getCrime(crimeID);
@@ -229,7 +232,6 @@ public class CrimeFragment extends Fragment {
             });
 
             // remember: unlike CrimeListFragment, I don't need to use multiple selection mode; I am only trying to delete ONE crime
-
         }
 
         // --- handle photo image button
@@ -251,6 +253,22 @@ public class CrimeFragment extends Fragment {
             mPhotoButton.setEnabled(false);                                             // ... disable button
         }
 
+        // ----- handle photo image view
+        mPhotoView = (ImageView) v.findViewById(R.id.crime_imageView);
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Photo photo = mCrime.getPhoto();
+                if (photo == null) {
+                    return;
+                }
+
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                String path = getActivity().getFileStreamPath(photo.getFilename()).getAbsolutePath();
+                ImageFragment.newInstance(path).show(fragmentManager, DIALOG_IMAGE);
+            }
+        });
+
 		return v;   // return view
 	}
 
@@ -271,7 +289,7 @@ public class CrimeFragment extends Fragment {
 		}
 	}
 	
-	// receive data from DatePickerFragment and TimePickerFragment
+	// receive data from DatePickerFragment, TimePickerFragment, or CrimeCameraFragment
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		if(resultCode != Activity.RESULT_OK) return;
@@ -297,7 +315,9 @@ public class CrimeFragment extends Fragment {
             // create new Photo object and attach it to the Crime object
             String filename = data.getStringExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
             if (filename != null) {
-                Log.i(TAG, "filename = " + filename);
+                Photo photo = new Photo(filename);
+                mCrime.setPhoto(photo);
+                showPhoto();
             }
         }
 	}
@@ -308,6 +328,18 @@ public class CrimeFragment extends Fragment {
 		CrimeLab.get(getActivity()) // get crimelab singleton
 					.saveCrimes(); 	// save crimes
 	}
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        showPhoto();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        PictureUtils.cleanImageView(mPhotoView);
+    }
 
     // ------- context menu handlers -------
     @Override
@@ -353,4 +385,15 @@ public class CrimeFragment extends Fragment {
 		mTimeButton.setText(DateFormat.format("hh:mm aa", date).toString()); // format display text
 	}
 
+    private void showPhoto() {
+        // (re)set the image button's image based on our photo
+        Photo photo = mCrime.getPhoto();
+        BitmapDrawable bitmapDrawable = null;
+        if (photo != null) {
+            String path = getActivity().getFileStreamPath(photo.getFilename()).getAbsolutePath();
+            bitmapDrawable = PictureUtils.getScaledDrawable(getActivity(), path);
+        }
+
+        mPhotoView.setImageDrawable(bitmapDrawable);
+    }
 }

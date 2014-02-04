@@ -11,3 +11,4 @@ AndroidProgramming
 *.iws
 */.idea/workspace.xml
 *.apk
+*/.idea/libraries/*

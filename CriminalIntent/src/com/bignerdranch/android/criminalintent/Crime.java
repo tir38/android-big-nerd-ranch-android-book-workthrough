@@ -7,20 +7,21 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Crime {
-	private UUID mID;
+    // JSON key strings
+    private static final String JSON_ID="id";
+    private static final String JSON_TITLE="title";
+    private static final String JSON_SOLVED="solved";
+    private static final String JSON_DATE="date";
+    private static final String JSON_PHOTO="photo";
+
+    private UUID mID;
 	private String mTitle;
 	private Date mDate; // date crime occurred
-	private boolean mSolved; // 
-	
-	// JSON key strings
-	private static final String JSON_ID="id";
-	private static final String JSON_TITLE="title";
-	private static final String JSON_SOLVED="solved";
-	private static final String JSON_DATE="date";
-	
-	
+	private boolean mSolved;
+    private Photo mPhoto;
+
 	public Crime(){ // constructor
-		mID = UUID.randomUUID(); // generate random (unique?) ID
+		mID = UUID.randomUUID(); // generate random ID
 		mDate = new Date(); // defaults to current date
 	}
 
@@ -29,6 +30,7 @@ public class Crime {
 		mSolved = jsonObject.getBoolean(JSON_SOLVED);
 		mDate = new Date(jsonObject.getLong(JSON_DATE));
 		mID = UUID.fromString(jsonObject.getString(JSON_ID));
+        mPhoto = new Photo((jsonObject.getJSONObject(JSON_PHOTO)));
 		
 	}
 	
@@ -61,7 +63,15 @@ public class Crime {
 		mSolved = isSolved;
 	}
 
-	@Override
+    public Photo getPhoto() {
+        return mPhoto;
+    }
+
+    public void setPhoto(Photo photo) {
+        mPhoto = photo;
+    }
+
+    @Override
 	public String toString(){
 		return mTitle;
 	}
