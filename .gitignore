@@ -1,14 +1,23 @@
-GeoQuiz/bin/*
-GeoQuiz/gen/*
 .gitignore~
 BNR_downloads/*
-CriminalIntent/bin/*
-CriminalIntent/gen/*
-CriminalIntent/out/*
-HelloMoon/gen/*
-HelloMoon/bin/*
-AndroidProgramming
-*.iws
-*/.idea/workspace.xml
+
+# builds
 *.apk
-*/.idea/libraries/*
+*out/
+
+# Java class files
+*.class
+
+# generated files
+*bin/
+*gen/
+target/
+*.iml
+
+# Local configuration file (sdk path, etc)
+local.properties
+.DS_Store
+.settings/
+
+#IntelliJ
+.idea/
