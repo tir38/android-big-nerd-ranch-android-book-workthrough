@@ -21,3 +21,4 @@ local.properties
 
 #IntelliJ
 .idea/
+*profiles_settings.xml
