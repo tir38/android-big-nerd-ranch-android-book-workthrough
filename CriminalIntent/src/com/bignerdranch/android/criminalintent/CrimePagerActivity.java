@@ -10,7 +10,7 @@ import android.support.v4.view.ViewPager;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class CrimePagerActivity extends FragmentActivity {
+public class CrimePagerActivity extends FragmentActivity implements CrimeFragment.Callbacks{
 	
 	private ViewPager mViewPager;
 	private ArrayList<Crime> mCrimes;
@@ -74,9 +74,14 @@ public class CrimePagerActivity extends FragmentActivity {
 			
 			@Override
 			public void onPageScrollStateChanged(int arg0) {} // do nothing
-		}); // finish anonymous inner class
-	} // onCreate()
-	
+		});
+	}
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+        // do nothing
+    }
+
 	public void updateActivityTitle(int position){
 		Crime crime = mCrimes.get(position); // get crime
 		if(crime.getTitle() != null){		// if title not null

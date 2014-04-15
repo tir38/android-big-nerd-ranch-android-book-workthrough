@@ -1,6 +1,7 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +20,8 @@ public class CrimeListFragment extends ListFragment {
 	// member variables
 	private boolean mIsSubtitleVisible;
 	private ArrayList<Crime> mCrimes;
-	private ImageButton mAddNewCrimeButon;
+	private ImageButton mAddNewCrimeButton;
+    private Callbacks mCallbacks;
 	
 	// extra string(s)
 	public static final String EXTRA_IS_SUBTITLE_VISIBLE = "com.bignerdranch.android.criminalintent.is_subtitle_visible";
@@ -28,7 +30,12 @@ public class CrimeListFragment extends ListFragment {
 	private static final int crimeFragmentRequestCode = 0;
 	
 	// for debugging
-	private static final String TAG = "CriminalIntent";	
+	private static final String TAG = "CriminalIntent";
+
+    // callbacks interface Required interface for hosting activities
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
+    }
 
     // ============= methods =========================
 	@Override
@@ -68,19 +75,18 @@ public class CrimeListFragment extends ListFragment {
 		}
 		
 		// set the empty view's button action to start a new crime
-		mAddNewCrimeButon = (ImageButton)view.findViewById(R.id.new_crime_button);
+		mAddNewCrimeButton = (ImageButton)view.findViewById(R.id.new_crime_button);
 		
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-			mAddNewCrimeButon.setBackground(null); // make backgroud transparent if SDK OK
+			mAddNewCrimeButton.setBackground(null); // make backgroud transparent if SDK OK
 		}
-		mAddNewCrimeButon.setOnClickListener(new OnClickListener() 
-			{ // anonymous inner class
-				@Override
-				public void onClick(View v) {
-					startNewCrime(); 
-				}
-			}
-		);
+		mAddNewCrimeButton.setOnClickListener(new OnClickListener() { // anonymous inner class
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     startNewCrime();
+                                                 }
+                                             }
+        );
 
         // setup Context menu
         ListView listView = (ListView)view.findViewById(android.R.id.list);
@@ -154,21 +160,29 @@ public class CrimeListFragment extends ListFragment {
                                 int position,
                                 long id){
 		Crime crime = ((CrimeAdapter)getListAdapter()).getItem(position); // get a crime using my custom adapter
-		
-		// create intent and start a CrimePagerActivity
-		Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
-		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());
-		startActivity(intent);
+
+        mCallbacks.onCrimeSelected(crime);
 	}
 
-	// update list any time the fragment resumes when returning from CrimeActivity
 	@Override
 	public void onResume(){
 		super.onResume(); // call super class method
-		((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
-	}
-	
-	// ------ handle options menu ------
+		((CrimeAdapter)getListAdapter()).notifyDataSetChanged();	// update list any time the fragment resumes when returning from CrimeActivity
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
+
+    // ------ handle options menu ------
     @Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
 		super.onCreateOptionsMenu(menu, inflater); 				// call super class
@@ -187,12 +201,7 @@ public class CrimeListFragment extends ListFragment {
 	public boolean onOptionsItemSelected(MenuItem menuItem){
 		switch (menuItem.getItemId()){
 			case R.id.menu_item_new_crime:
-//				Crime crime = new Crime();												// instantiate new crime
-//				CrimeLab.get(getActivity()).addCrime(crime); 							// get crimelab singleton and add crime
-//				Intent intent = new Intent(getActivity(), CrimePagerActivity.class); 	// start crime pager activity for new (blank) crime (which starts CrimeFragment)
-//				intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());			// pass CrimeFragment which crime ID to display
-//				startActivityForResult(intent, crimeFragmentRequestCode); 				// pass crimeFragment its results code
-				startNewCrime();
+                startNewCrime();
 				return true;
 				
 			case R.id.menu_item_show_subtitle:
@@ -245,11 +254,14 @@ public class CrimeListFragment extends ListFragment {
 	private void startNewCrime(){
 		Crime crime = new Crime();												// instantiate new crime
 		CrimeLab.get(getActivity()).addCrime(crime); 							// get crimelab singleton and add crime
-		Intent intent = new Intent(getActivity(), CrimePagerActivity.class); 	// start crime pager activity for new (blank) crime (which starts CrimeFragment)
-		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getID());			// pass CrimeFragment which crime ID to display
-		startActivityForResult(intent, crimeFragmentRequestCode); 				// pass crimeFragment its results code
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
+        mCallbacks.onCrimeSelected(crime);
 	}
-	
+
+    public void updateUI() {
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
+    }
+
 	// =================== inner class to handle Crime adapter =================== 
 	// WTF_isGoingOnHere: this adapter juggles an ArrayList to provide views for each item in the list.
 	// The fragment can't do this itself; The Adapter is especially good at the repetitive task

@@ -51,6 +51,11 @@ public class CrimeFragment extends Fragment {
     private ImageButton mPhotoButton;
     private Button mSuspectButton;
     private ImageView mPhotoView;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
 
     //================== methods ======================================================
     // instantiate a new CrimeFragment based on a crime's ID
@@ -100,6 +105,7 @@ public class CrimeFragment extends Fragment {
                                       int before,
                                       int count) {
                 mCrime.setTitle(c.toString());            // convert charSeq to string; set crime's title to string
+                mCallbacks.onCrimeUpdated(mCrime);
             }
 
             public void beforeTextChanged(CharSequence c,
@@ -158,6 +164,7 @@ public class CrimeFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // set the crime's solved variable
                 mCrime.setSolved(isChecked);
+                mCallbacks.onCrimeUpdated(mCrime);
             }
         });
 
@@ -371,6 +378,8 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setText(suspect);
             cursor.close();
         }
+
+        mCallbacks.onCrimeUpdated(mCrime);
     }
 
     @Override
@@ -390,6 +399,18 @@ public class CrimeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         PictureUtils.cleanImageView(mPhotoView);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
     }
 
     // ------- context menu handlers -------
