@@ -1,12 +1,15 @@
 .gitignore~
 BNR_downloads/*
 
+
 # builds
 *.apk
 *out/
 
+
 # Java class files
 *.class
+
 
 # generated files
 *bin/
@@ -14,11 +17,18 @@ BNR_downloads/*
 target/
 *.iml
 
+
 # Local configuration file (sdk path, etc)
 local.properties
 .DS_Store
 .settings/
 
+
 #IntelliJ
 .idea/
 *profiles_settings.xml
+
+
+#Android Studio / Gradle
+*build/
+*.gradle
