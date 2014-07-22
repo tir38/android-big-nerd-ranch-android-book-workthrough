@@ -19,8 +19,8 @@ public class FlickrFetchr {
     private static final String TAG = "FlickrFetchr";
 
     // URL builder string constants
-    private static final String ENDPOINT = "http://api.flickr.com/services/rest";
-    private static final String API_KEY = "4f721bbafa75bf6d2cb5af54f937bb70";
+    private static final String ENDPOINT = "https://api.flickr.com/services/rest";
+    private static final String API_KEY = "b0a574d9e231935b3dd06f6186a10ab7";
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String PARAMS_EXTRAS = "extras"; // not an intent extra
     private static final String EXTRA_SMALL_URL = "url_s"; // not an intent extra
@@ -129,6 +129,5 @@ public class FlickrFetchr {
 
             eventType = parser.next();
         }
-
     }
 }
