@@ -3,9 +3,11 @@ package com.bignerdranch.android.photogallery;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
@@ -15,13 +17,15 @@ public class PhotoGalleryFragment extends Fragment {
 
     private static final String TAG = "PhotoGalleryFragment";
     private GridView mGridView;
-    ArrayList<GalleryItem> mItems;
+    private ArrayList<GalleryItem> mItems;
+    private int mCurrentPageNumber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new FetchItemsTask().execute();
+        mCurrentPageNumber = 1; // 1-indexed paging
+        new FetchItemsTask().execute(mCurrentPageNumber);
     }
 
     @Override
@@ -42,16 +46,47 @@ public class PhotoGalleryFragment extends Fragment {
         }  else {
             mGridView.setAdapter(null);
         }
+
+        mGridView.setOnScrollListener(new CustomScrollListener());
+    }
+
+    /**
+     * private inner class to listen for scroll events
+     */
+    private class CustomScrollListener implements AbsListView.OnScrollListener {
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            // do nothing
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (totalItemCount == 0) {
+                // adapter is still loading
+                return;
+            }
+
+            // if at end of list
+            int lastItemCount = firstVisibleItem + visibleItemCount;
+
+            if (lastItemCount >= totalItemCount) {
+                Log.d(TAG, "at the end of the list");
+                mCurrentPageNumber++;
+                new FetchItemsTask().execute(mCurrentPageNumber); // API 13+ this will default to serial
+            }
+        }
     }
 
     /**
      * private inner class to handle async task
      */
-    private class FetchItemsTask extends AsyncTask<Void, Void, ArrayList<GalleryItem> > {
+    private class FetchItemsTask extends AsyncTask<Integer, Void, ArrayList<GalleryItem> > {
 
         @Override
-        protected ArrayList<GalleryItem> doInBackground(Void... params) {
-            return new FlickrFetchr().fetchItems();
+        protected ArrayList<GalleryItem> doInBackground(Integer... params) {
+            Integer pageNumber = params[0];
+            return new FlickrFetchr().getPage(pageNumber);
         }
 
         @Override

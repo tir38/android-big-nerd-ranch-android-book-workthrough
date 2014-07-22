@@ -2,6 +2,7 @@ package com.bignerdranch.android.photogallery;
 
 import android.net.Uri;
 import android.util.Log;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -22,11 +23,11 @@ public class FlickrFetchr {
     private static final String ENDPOINT = "https://api.flickr.com/services/rest";
     private static final String API_KEY = "b0a574d9e231935b3dd06f6186a10ab7";
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
-    private static final String PARAMS_EXTRAS = "extras"; // not an intent extra
-    private static final String EXTRA_SMALL_URL = "url_s"; // not an intent extra
+    private static final String PARAMS_EXTRAS = "extras";
+    private static final String PARAMS_PAGE = "page";
+    private static final String EXTRA_SMALL_URL = "url_s";
 
     private static final String XML_PHOTO = "photo"; // xml tag that holds a photo
-
 
     /**
      * Do actual HTTP request and get bytes
@@ -62,31 +63,43 @@ public class FlickrFetchr {
         }
     }
 
-    /**
-     * Helper method to call getUrlBytes and save output as string
-     * @param urlSpec url string
-     * @return response as string
-     * @throws IOException
-     */
-    public String getUrl(String urlSpec) throws IOException {
-        return new  String(getUrlBytes(urlSpec));
+    public ArrayList<GalleryItem> getItems() {
+        // build URL string
+        String url = Uri.parse(ENDPOINT)
+                .buildUpon()
+                .appendQueryParameter("method", METHOD_GET_RECENT)
+                .appendQueryParameter("api_key", API_KEY)
+                .appendQueryParameter(PARAMS_EXTRAS, EXTRA_SMALL_URL)
+                .build()
+                .toString();
+
+        return  fetchItems(url);
     }
 
+    public ArrayList<GalleryItem> getPage(int pageNumber) {
+        // build URL string
+        String url = Uri.parse(ENDPOINT)
+                .buildUpon()
+                .appendQueryParameter("method", METHOD_GET_RECENT)
+                .appendQueryParameter("api_key", API_KEY)
+                .appendQueryParameter(PARAMS_EXTRAS, EXTRA_SMALL_URL)
+                .appendQueryParameter(PARAMS_PAGE, String.valueOf(pageNumber))
+                .build()
+                .toString();
 
-    public ArrayList<GalleryItem> fetchItems() {
+        return  fetchItems(url);
+    }
+
+    /**
+     * heavy lifting: make request and parse response
+     * @param url
+     * @return an ArrayList of GalleryItem s
+     */
+    private ArrayList<GalleryItem> fetchItems(String url) {
 
         ArrayList<GalleryItem> items = new ArrayList<GalleryItem>();
 
         try {
-            // build URL string
-            String url = Uri.parse(ENDPOINT)
-                    .buildUpon()
-                    .appendQueryParameter("method", METHOD_GET_RECENT)
-                    .appendQueryParameter("api_key", API_KEY)
-                    .appendQueryParameter(PARAMS_EXTRAS, EXTRA_SMALL_URL)
-                    .build()
-                    .toString();
-
             // get XML from URL
             String xmlString = getUrl(url);
 
@@ -129,5 +142,15 @@ public class FlickrFetchr {
 
             eventType = parser.next();
         }
+    }
+
+    /**
+     * Helper method to call getUrlBytes and save output as string
+     * @param urlSpec url string
+     * @return response as string
+     * @throws IOException
+     */
+    private String getUrl(String urlSpec) throws IOException {
+        return new  String(getUrlBytes(urlSpec));
     }
 }
