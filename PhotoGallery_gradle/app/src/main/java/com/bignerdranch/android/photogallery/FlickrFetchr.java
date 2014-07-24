@@ -96,7 +96,6 @@ public class FlickrFetchr {
      * @return an ArrayList of GalleryItem s
      */
     private ArrayList<GalleryItem> fetchItems(String url) {
-
         ArrayList<GalleryItem> items = new ArrayList<GalleryItem>();
 
         try {

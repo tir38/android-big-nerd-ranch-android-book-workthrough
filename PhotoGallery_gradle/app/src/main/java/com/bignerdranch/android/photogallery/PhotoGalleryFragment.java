@@ -1,7 +1,9 @@
 package com.bignerdranch.android.photogallery;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ public class PhotoGalleryFragment extends Fragment {
     private GridView mGridView;
     private ArrayList<GalleryItem> mItems;
     private int mCurrentPageNumber;
+    private ThumbnailDownloader<ImageView> mThumbnailThread;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,6 +30,20 @@ public class PhotoGalleryFragment extends Fragment {
         setRetainInstance(true);
         mCurrentPageNumber = 1; // 1-indexed paging
         new FetchItemsTask().execute(mCurrentPageNumber);
+
+        // setup background thread / looper / handler
+        mThumbnailThread = new ThumbnailDownloader<ImageView>(new Handler()); // pass a handler for receiving responses from Thumbnail Downloader
+        mThumbnailThread.setListener(new ThumbnailDownloader.Listener<ImageView>() {
+            @Override
+            public void onThumbnailDownloaded(ImageView imageView, Bitmap thumbnail) {
+                if (isVisible()) {
+                    imageView.setImageBitmap(thumbnail);
+                }
+            }
+        });
+        mThumbnailThread.start();
+        mThumbnailThread.getLooper();
+        Log.i(TAG, "Background thread started");
     }
 
     @Override
@@ -35,6 +52,19 @@ public class PhotoGalleryFragment extends Fragment {
         mGridView = (GridView) view.findViewById(R.id.gridView);
         setupAdapter();
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mThumbnailThread.quit();
+        Log.i(TAG, "Background thread destroyed");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mThumbnailThread.clearQueue();
     }
 
     private void setupAdapter() {
@@ -66,7 +96,12 @@ public class PhotoGalleryFragment extends Fragment {
             }
 
             ImageView imageView = (ImageView) convertView.findViewById(R.id.gallery_item_image_view);
-            imageView.setImageResource(R.drawable.brian_up_close);
+            imageView.setImageResource(R.drawable.brian_up_close); // set default image
+
+            // load image from web
+            GalleryItem item = getItem(position);
+            mThumbnailThread.queueThumbnail(imageView, item.getUrl());
+
             return convertView;
         }
     }
@@ -93,6 +128,7 @@ public class PhotoGalleryFragment extends Fragment {
 
             if (lastItemCount >= totalItemCount) {
                 Log.d(TAG, "at the end of the list");
+                mThumbnailThread.clearQueue();
                 mCurrentPageNumber++;
                 new FetchItemsTask().execute(mCurrentPageNumber); // API 13+ this will default to serial
             }
