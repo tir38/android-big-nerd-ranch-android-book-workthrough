@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class FlickrFetchr {
 
     private static final String TAG = "FlickrFetchr";
+    public static final String PREF_SEARCH_QUERY = "searchQuery";
 
     // URL builder string constants
     private static final String ENDPOINT = "https://api.flickr.com/services/rest";

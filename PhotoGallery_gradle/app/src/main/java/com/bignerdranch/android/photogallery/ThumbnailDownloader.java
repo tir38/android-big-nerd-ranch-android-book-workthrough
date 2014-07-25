@@ -50,7 +50,6 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
                     if (requestMap.get(token) == null) {
                         Log.e(TAG, "url is null for token: " + token.toString());
                     }
-                    Log.i(TAG, "Got a request for URL: " + requestMap.get(token));
                     handleRequest(token);
                 }
             }
@@ -62,7 +61,6 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
     }
 
     public void queueThumbnail(Token token, String url) {
-        Log.i(TAG, "Got a URL: " + url);
         requestMap.put(token, url);
         mHandler.obtainMessage(MESSAGE_DOWNLOAD, token).sendToTarget();
     }
@@ -84,9 +82,7 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
             // check cache
             if (mBitmapLruCache.get(url) != null) {
                 bitmap = mBitmapLruCache.get(url);
-                Log.d(TAG, "pulling from cache: " + url);
             } else { // download and add to cache
-                Log.d(TAG, "downloading instead: " + url);
                 byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
                 bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
                 Log.i(TAG, "bitmap created");

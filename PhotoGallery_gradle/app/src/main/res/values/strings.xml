@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PhotoGallery</string>
+    <string name="search">Search</string>
+    <string name="search_clear">Clear Search</string>
+    <string name="search_hint">Search Flickr</string>
+
 </resources>

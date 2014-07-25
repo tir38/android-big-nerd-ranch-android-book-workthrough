@@ -1,12 +1,17 @@
 package com.bignerdranch.android.photogallery;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -20,17 +25,18 @@ public class PhotoGalleryFragment extends Fragment {
     private static final String TAG = "PhotoGalleryFragment";
     private GridView mGridView;
     private ArrayList<GalleryItem> mItems;
-//    private int mCurrentPageNumber;
+    //    private int mCurrentPageNumber;
     private ThumbnailDownloader<ImageView> mThumbnailThread;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
+
 //        mCurrentPageNumber = 1; // 1-indexed paging
 //        new FetchItemsTask().execute(mCurrentPageNumber);
-        new FetchItemsTask().execute();
-
+        updateItems();
 
         // setup background thread / looper / handler
         mThumbnailThread = new ThumbnailDownloader<ImageView>(new Handler()); // pass a handler for receiving responses from Thumbnail Downloader
@@ -47,12 +53,40 @@ public class PhotoGalleryFragment extends Fragment {
         Log.i(TAG, "Background thread started");
     }
 
+    public void updateItems() {
+        new FetchItemsTask().execute();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photo_gallery, container, false);
         mGridView = (GridView) view.findViewById(R.id.gridView);
         setupAdapter();
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_photo_gallery, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_search:
+                getActivity().onSearchRequested();
+                return true;
+            case R.id.meni_item_clear:
+                PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .edit()
+                        .putString(FlickrFetchr.PREF_SEARCH_QUERY, null)
+                        .commit();
+                updateItems();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -75,7 +109,7 @@ public class PhotoGalleryFragment extends Fragment {
 
         if (mItems != null) {
             mGridView.setAdapter(new GalleryItemAdapter(mItems));
-        }  else {
+        } else {
             mGridView.setAdapter(null);
         }
 
@@ -93,7 +127,7 @@ public class PhotoGalleryFragment extends Fragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = getActivity() .getLayoutInflater().inflate(R.layout.gallery_item, parent, false);
+                convertView = getActivity().getLayoutInflater().inflate(R.layout.gallery_item, parent, false);
             }
 
             ImageView imageView = (ImageView) convertView.findViewById(R.id.gallery_item_image_view);
@@ -139,13 +173,20 @@ public class PhotoGalleryFragment extends Fragment {
     /**
      * private inner class to handle async task
      */
-    private class FetchItemsTask extends AsyncTask<Integer, Void, ArrayList<GalleryItem> > {
+    private class FetchItemsTask extends AsyncTask<Integer, Void, ArrayList<GalleryItem>> {
 
         @Override
         protected ArrayList<GalleryItem> doInBackground(Integer... params) {
 
-            String query = "android"; // TODO
-            if (query != null ) {
+            Activity activity = getActivity();
+            if (activity == null) {
+                return new ArrayList<GalleryItem>();
+            }
+
+            String query = PreferenceManager.getDefaultSharedPreferences(activity)
+                    .getString(FlickrFetchr.PREF_SEARCH_QUERY, null);
+
+            if (query != null) {
                 return new FlickrFetchr().search(query);
             } else {
                 return new FlickrFetchr().getItems();
