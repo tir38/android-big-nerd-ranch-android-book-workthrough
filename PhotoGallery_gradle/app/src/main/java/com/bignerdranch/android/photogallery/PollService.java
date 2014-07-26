@@ -2,12 +2,16 @@ package com.bignerdranch.android.photogallery;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -16,7 +20,7 @@ public class PollService extends IntentService {
 
     private static final String TAG = "PollService";
     private static final int POLL_INTERVAL = 1000 * 15; // 15 seconds
-    private static final int POLL_SERVICE_REQUEST = 0;
+    private static final int POLL_SERVICE_REQUEST_CODE = 0;
 
     public PollService() {
         super(TAG);
@@ -32,7 +36,7 @@ public class PollService extends IntentService {
         Intent intent = new Intent(context, PollService.class);
 
         int flags = 0;
-        PendingIntent pendingIntent = PendingIntent.getService(context, POLL_SERVICE_REQUEST, intent, flags);
+        PendingIntent pendingIntent = PendingIntent.getService(context, POLL_SERVICE_REQUEST_CODE, intent, flags);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
 
@@ -52,10 +56,9 @@ public class PollService extends IntentService {
      */
     public static boolean isServiceAlarmOn(Context context) {
         Intent intent = new Intent(context, PollService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(context, POLL_SERVICE_REQUEST, intent, PendingIntent.FLAG_NO_CREATE);
+        PendingIntent pendingIntent = PendingIntent.getService(context, POLL_SERVICE_REQUEST_CODE, intent, PendingIntent.FLAG_NO_CREATE);
         return pendingIntent != null;
     }
-
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -88,6 +91,25 @@ public class PollService extends IntentService {
 
         if (!resultId.equals(lastResultId)) {
             Log.i(TAG, "Got a new result: " + resultId);
+            Resources r = getResources();
+
+            // create pending intent
+            Intent startPhotoGalleryActivityIntent = new Intent(this, PhotoGalleryActivity.class);
+            int flags = 0;
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, POLL_SERVICE_REQUEST_CODE, startPhotoGalleryActivityIntent, flags);
+
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setTicker(r.getString(R.string.new_pictures_title))
+                    .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                    .setContentTitle(r.getString(R.string.new_pictures_title))
+                    .setContentText(r.getString(R.string.new_pictures_text))
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .getNotification(); // TODO: deprecated
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.notify(0, notification);
+
         } else {
             Log.i(TAG, "Got an old result: " + resultId);
         }
