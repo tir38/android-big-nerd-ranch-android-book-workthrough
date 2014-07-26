@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -225,6 +226,9 @@ public class PhotoGalleryFragment extends Fragment {
         protected void onPostExecute(ArrayList<GalleryItem> items) {
             mItems = items;
             setupAdapter();
+
+            String toastString = "Found " + items.size() + " images.";
+            Toast.makeText(getActivity(), toastString, Toast.LENGTH_SHORT).show();
         }
     }
 }
