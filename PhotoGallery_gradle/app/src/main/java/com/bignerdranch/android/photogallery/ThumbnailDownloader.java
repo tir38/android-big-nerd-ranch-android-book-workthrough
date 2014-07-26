@@ -5,8 +5,8 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.support.v4.util.LruCache;
 import android.util.Log;
-import android.util.LruCache;
 
 import java.io.IOException;
 import java.util.Collections;
