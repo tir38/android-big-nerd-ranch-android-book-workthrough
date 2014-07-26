@@ -10,8 +10,13 @@
         android:actionViewClass="android.widget.SearchView"/>
 
     <item
-        android:id="@+id/meni_item_clear"
+        android:id="@+id/menu_item_clear"
         android:title="@string/search_clear"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_item_toggle_polling"
+        android:title="@string/start_polling"
         android:showAsAction="ifRoom"/>
 </menu>

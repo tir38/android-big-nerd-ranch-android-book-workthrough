@@ -1,5 +1,6 @@
 package com.bignerdranch.android.photogallery;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
@@ -93,6 +94,7 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     @Override
+    @TargetApi(11)
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -104,15 +106,37 @@ public class PhotoGalleryFragment extends Fragment {
                 // start search; pre populate prior search query if available
                 getActivity().startSearch(priorQuery, false, null, false);
                 return true;
-            case R.id.meni_item_clear:
+            case R.id.menu_item_clear:
                 PreferenceManager.getDefaultSharedPreferences(getActivity())
                         .edit()
                         .putString(FlickrFetchr.PREF_SEARCH_QUERY, null)
                         .commit();
                 updateItems();
                 return true;
+            case R.id.menu_item_toggle_polling:
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());
+                PollService.setServiceAlarm(getActivity(), shouldStartAlarm);
+
+                // redraw actionbar
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    getActivity().invalidateOptionsMenu();
+                }
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem toggleItem = menu.findItem(R.id.menu_item_toggle_polling);
+        if (PollService.isServiceAlarmOn(getActivity())) {
+            toggleItem.setTitle(R.string.stop_polling);
+        } else {
+            toggleItem.setTitle(R.string.start_polling);
         }
     }
 
@@ -217,6 +241,7 @@ public class PhotoGalleryFragment extends Fragment {
                 return new FlickrFetchr().search(query);
             } else {
                 return new FlickrFetchr().getItems();
+
             }
 //            Integer pageNumber = params[0];
 //            return new FlickrFetchr().getPage(pageNumber);

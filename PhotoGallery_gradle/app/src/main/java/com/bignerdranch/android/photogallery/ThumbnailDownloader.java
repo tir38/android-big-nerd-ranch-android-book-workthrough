@@ -46,10 +46,6 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
                 if (message.what == MESSAGE_DOWNLOAD) {
                     @SuppressWarnings("unchecked")
                     Token token = (Token) message.obj;
-
-                    if (requestMap.get(token) == null) {
-                        Log.e(TAG, "url is null for token: " + token.toString());
-                    }
                     handleRequest(token);
                 }
             }
@@ -85,7 +81,6 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
             } else { // download and add to cache
                 byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
                 bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
-                Log.i(TAG, "bitmap created");
                 mBitmapLruCache.put(url, bitmap);
             }
 
