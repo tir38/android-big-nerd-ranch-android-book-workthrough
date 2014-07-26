@@ -34,15 +34,16 @@ public class FlickrFetchr {
 
     /**
      * Do actual HTTP request and get bytes
+     *
      * @param urlSpec
      * @return
      * @throws IOException
      */
-    public byte[] getUrlBytes(String urlSpec) throws IOException{
+    public byte[] getUrlBytes(String urlSpec) throws IOException {
 
         // open connection with new url
         URL url = new URL(urlSpec);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -76,7 +77,7 @@ public class FlickrFetchr {
                 .build()
                 .toString();
 
-        return  downloadGalleryItems(url);
+        return downloadGalleryItems(url);
     }
 
     public ArrayList<GalleryItem> getPage(int pageNumber) {
@@ -89,7 +90,7 @@ public class FlickrFetchr {
                 .build()
                 .toString();
 
-        return  downloadGalleryItems(url);
+        return downloadGalleryItems(url);
     }
 
     public ArrayList<GalleryItem> search(String query) {
@@ -102,11 +103,12 @@ public class FlickrFetchr {
                 .build()
                 .toString();
 
-        return  downloadGalleryItems(url);
+        return downloadGalleryItems(url);
     }
 
     /**
      * heavy lifting: make request and parse response
+     *
      * @param url
      * @return an ArrayList of GalleryItem s
      */
@@ -160,11 +162,12 @@ public class FlickrFetchr {
 
     /**
      * Helper method to call getUrlBytes and save output as string
+     *
      * @param urlSpec url string
      * @return response as string
      * @throws IOException
      */
     private String getUrl(String urlSpec) throws IOException {
-        return new  String(getUrlBytes(urlSpec));
+        return new String(getUrlBytes(urlSpec));
     }
 }
