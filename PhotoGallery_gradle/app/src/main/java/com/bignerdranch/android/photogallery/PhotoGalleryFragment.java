@@ -82,7 +82,7 @@ public class PhotoGalleryFragment extends Fragment {
             SearchView searchView = (SearchView) searchItem.getActionView();
 
             // get the data from our searchble.xml as a SearchableInfo
-            SearchManager searchManager = (SearchManager)getActivity()
+            SearchManager searchManager = (SearchManager) getActivity()
                     .getSystemService(Context.SEARCH_SERVICE);
             ComponentName name = getActivity().getComponentName();
             SearchableInfo searchableInfo = searchManager.getSearchableInfo(name);
@@ -93,9 +93,15 @@ public class PhotoGalleryFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.menu_item_search:
-                getActivity().onSearchRequested();
+                // get prior query
+                String priorQuery = PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .getString(FlickrFetchr.PREF_SEARCH_QUERY, null);
+
+                // start search; pre populate prior search query if available
+                getActivity().startSearch(priorQuery, false, null, false);
                 return true;
             case R.id.meni_item_clear:
                 PreferenceManager.getDefaultSharedPreferences(getActivity())
