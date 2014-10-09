@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class PollService extends IntentService {
 
     private static final String TAG = "PollService";
-    private static final int POLL_INTERVAL = 1000 * 15; // 15 seconds
+    private static final int POLL_INTERVAL = 1000 * 60 * 5; // 5 minutes
     private static final int POLL_SERVICE_REQUEST_CODE = 0;
 
     public PollService() {
